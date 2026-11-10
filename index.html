@@ -1,258 +1,321 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#002b59" />
-  <meta name="description" content="Organigramme interactif des regroupements, secteurs et périmètres du projet 50000." />
-  <title>50000 — Cartographie des périmètres</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#002b59">
+  <meta name="description" content="Les notions de référence : regroupements des mobilités, secteurs et périmètres.">
+  <title>Les notions de référence — 50000</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { --navy:#002b59; --gold:#ffce3e; --white:#ffffff; --stroke:rgba(255,206,62,.34); --mute:rgba(255,255,255,.64); --soft:rgba(255,255,255,.075); --soft-gold:rgba(255,206,62,.09); --font:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
-    *,*::before,*::after {box-sizing:border-box}
-    html {scroll-behavior:smooth}
-    body {margin:0;background:var(--navy);color:var(--white);font-family:var(--font);font-size:14px;line-height:1.5;min-width:320px}
-    button,input {font:inherit}
-    button {cursor:pointer}
-    button:focus-visible,input:focus-visible {outline:3px solid var(--gold);outline-offset:3px}
-    .sr-only {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-    .shell {max-width:1680px;margin:auto;padding:0 clamp(16px,2.9vw,48px) 40px}
-    .topline {height:6px;background:linear-gradient(90deg,var(--gold) 0 32%,rgba(255,206,62,.12) 32% 100%)}
-    .topbar {display:flex;align-items:center;justify-content:space-between;gap:16px;padding:21px 0 25px;border-bottom:1px solid var(--stroke)}
-    .brand {display:flex;align-items:center;gap:13px;min-width:0}
-    .brand-mark {display:grid;place-items:center;min-width:48px;width:48px;height:48px;background:var(--gold);color:var(--navy);border-radius:13px;font-weight:950;letter-spacing:-2px;font-size:17px}
-    .brand-eyebrow {display:block;letter-spacing:.22em;font-weight:800;text-transform:uppercase;font-size:10px;color:var(--gold)}
-    .brand-sub {display:block;font-weight:730;font-size:13px;letter-spacing:.02em}
-    .toplink {font-weight:750;color:var(--gold);text-decoration:none;border:1px solid var(--stroke);padding:9px 12px;border-radius:10px;white-space:nowrap}
-    .toplink:hover {background:var(--soft-gold)}
-    .hero {position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,390px);gap:30px;overflow:hidden;padding:45px 0 31px;isolation:isolate}
-    .hero::before {content:"";position:absolute;right:-32px;top:-75px;width:465px;height:465px;border:1px solid rgba(255,206,62,.17);border-radius:50%;box-shadow:0 0 0 41px rgba(255,206,62,.025),0 0 0 87px rgba(255,206,62,.02);z-index:-1}
-    .hero::after {content:"50000";position:absolute;right:0;top:0;font-size:clamp(85px,16vw,232px);line-height:1;letter-spacing:-.08em;font-weight:900;color:rgba(255,206,62,.045);pointer-events:none;z-index:-1}
-    .kicker {display:flex;align-items:center;gap:9px;color:var(--gold);font-size:11px;text-transform:uppercase;font-weight:850;letter-spacing:.22em}
-    .kicker::before {content:"";width:24px;height:2px;background:var(--gold)}
-    h1 {margin:12px 0 13px;font-size:clamp(38px,5vw,69px);line-height:1.04;letter-spacing:-.055em;font-weight:850}
-    h1 span {color:var(--gold)}
-    .intro {max-width:710px;color:var(--mute);font-size:clamp(13px,1.3vw,16px);line-height:1.8;margin:0}
-    .summary {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-self:end;margin-bottom:2px}
-    .metric {padding:19px 13px 17px;background:var(--soft);border:1px solid rgba(255,255,255,.13);border-radius:14px;position:relative;min-width:0}
-    .metric::before {content:"";height:3px;width:32px;position:absolute;top:0;left:13px;background:var(--gold)}
-    .metric strong {display:block;color:var(--gold);font-size:clamp(25px,2.8vw,38px);line-height:1.1;font-weight:850;letter-spacing:-.04em}
-    .metric span {display:block;color:var(--white);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
-    .section-heading {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:17px;margin-bottom:13px}
-    .section-heading h2 {margin:0;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:840;color:var(--gold)}
-    .section-heading .micro {font-size:11px;color:var(--mute)}
-    .region-tabs {display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:19px}
-    .region-tab {text-align:left;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.025);border-radius:16px;padding:16px 19px;color:var(--white);transition:background .15s,border-color .15s}
-    .region-tab:hover {background:var(--soft-gold)}
-    .region-tab.active {background:var(--gold);color:var(--navy);border-color:var(--gold)}
-    .region-left {display:flex;flex-direction:column;gap:4px;min-width:0}
-    .region-id {font-size:11px;font-weight:900;letter-spacing:.15em;opacity:.76}
-    .region-name {font-size:clamp(15px,1.45vw,20px);font-weight:850;letter-spacing:-.03em;line-height:1.25}
-    .region-count {font-size:11px;opacity:.72;white-space:nowrap}
-    .region-arrow {display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border:1px solid currentColor;border-radius:50%;font-size:19px}
-    .workspace {display:grid;grid-template-columns:295px minmax(0,1fr);gap:18px;align-items:start}
-    .sidebar {display:flex;flex-direction:column;gap:14px}
-    .panel {border:1px solid var(--stroke);border-radius:17px;background:rgba(255,255,255,.025);overflow:hidden}
-    .panel-head {padding:17px 18px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .panel-label {font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:840}
-    .panel-title {font-size:18px;letter-spacing:-.035em;font-weight:840;margin:3px 0 0}
-    .panel-body {padding:0 18px 18px}
-    .search-wrap {position:relative}
-    .search-wrap::before {content:"⌕";color:var(--gold);font-size:25px;position:absolute;left:13px;top:6px;pointer-events:none}
-    .search {width:100%;height:45px;padding:0 37px 0 39px;border:1px solid var(--stroke);background:var(--navy);color:var(--white);border-radius:10px;outline:0;min-width:0}
-    .search::placeholder {color:var(--mute)}
-    .search::-webkit-search-cancel-button {filter:grayscale(1) brightness(3)}
-    .search-foot {font-size:11px;color:var(--mute);margin:10px 2px 0}
-    .search-results {display:flex;flex-direction:column;gap:6px;margin-top:11px;max-height:248px;overflow:auto}
-    .result {display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;width:100%;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:var(--soft);padding:9px;color:var(--white)}
-    .result:hover {border-color:var(--gold)}
-    .result strong {color:var(--gold);font-size:11px;display:block}
-    .result small {color:var(--white);display:block;font-size:11px;line-height:1.3}
-    .legend-item {display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:center;margin:13px 0;font-size:12px;font-weight:700}
-    .legend-swatch {width:19px;height:19px;border:2px solid var(--gold);border-radius:5px;background:var(--navy)}
-    .legend-swatch.root {background:var(--gold)}
-    .legend-swatch.coordinateur {border-style:dashed}
-    .legend-swatch.annexe {background:var(--gold);clip-path:polygon(0 0, 80% 0,100% 25%,100% 100%,0 100%)}
-    .legend-swatch.perimetre {border-color:rgba(255,255,255,.65);background:var(--soft)}
-    .legend-item span small {display:block;font-size:10px;color:var(--mute);font-weight:500;margin-top:2px}
-    .details-head {padding:17px 18px 10px}
-    .details {padding:0 18px 17px}
-    .details-type {color:var(--gold);text-transform:uppercase;font-size:10px;font-weight:850;letter-spacing:.14em;margin:0 0 8px}
-    .details-name {font-size:18px;line-height:1.35;letter-spacing:-.02em;font-weight:790;margin:0 0 14px;overflow-wrap:anywhere}
-    .detail-codes {display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
-    .detail-chip {font-size:11px;border:1px solid var(--stroke);border-radius:7px;padding:5px 8px;font-weight:750;color:var(--gold)}
-    .detail-chip strong {color:var(--white);margin-right:4px;font-weight:500}
-    .breadcrumb {display:flex;flex-direction:column;gap:0;margin:9px 0 0;padding:0 0 0 10px;list-style:none;border-left:1px solid var(--stroke)}
-    .breadcrumb li {position:relative;margin:0 0 11px 0;padding-left:13px;font-size:11px;color:var(--mute);line-height:1.4;overflow-wrap:anywhere}
-    .breadcrumb li::before {content:"";width:7px;height:7px;border:1px solid var(--gold);background:var(--navy);border-radius:50%;position:absolute;left:-14px;top:4px}
-    .breadcrumb li:last-child {color:var(--gold);font-weight:800;margin-bottom:0}
-    .panel-footer {border-top:1px solid var(--stroke);padding:12px 18px;color:var(--mute);font-size:11px}
-    .organigram {min-width:0}
-    .toolbar {display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-    .tools-left,.tools-right {display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-    .tool-btn {background:transparent;border:1px solid var(--stroke);color:var(--white);padding:9px 12px;border-radius:9px;font-size:12px;font-weight:750;min-height:38px;line-height:1.2}
-    .tool-btn:hover {background:var(--soft-gold);border-color:var(--gold)}
-    .tool-btn.primary {color:var(--navy);background:var(--gold);border-color:var(--gold)}
-    .tool-btn.current {border-color:var(--gold);color:var(--gold)}
-    .tool-btn.icon-only {min-width:38px;padding:8px;font-size:18px;line-height:1}
-    .zoom-label {font-size:11px;color:var(--gold);font-weight:800;min-width:43px;text-align:center}
-    .canvas-card {border:1px solid var(--stroke);border-radius:18px;overflow:hidden;background:var(--navy);position:relative}
-    .canvas-bar {display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid rgba(255,206,62,.21)}
-    .canvas-title {display:flex;align-items:center;gap:8px;font-size:12px;font-weight:850;min-width:0}
-    .canvas-title::before {content:"";width:8px;height:8px;background:var(--gold);border-radius:50%;box-shadow:0 0 0 5px var(--soft-gold)}
-    .canvas-sub {font-size:11px;color:var(--mute);text-align:right}
-    .viewport {height:clamp(490px,65vh,830px);overflow:auto;position:relative;overscroll-behavior:contain;scrollbar-color:var(--gold) var(--navy);scrollbar-width:thin;cursor:grab;background-image:radial-gradient(circle,rgba(255,206,62,.15) 1px,transparent 1px);background-size:25px 25px;background-position:12px 12px}
-    .viewport.dragging {cursor:grabbing;user-select:none}
-    .viewport:focus-visible {outline:2px solid var(--gold);outline-offset:-3px}
-    .scene {position:relative;min-width:100%;min-height:100%}
-    .graph-inner {position:absolute;left:0;top:0;transform-origin:top left}
-    .links {position:absolute;top:0;left:0;overflow:visible;pointer-events:none}
-    .links path {fill:none;stroke:var(--gold);stroke-width:2;opacity:.7}
-    .links circle {fill:var(--gold);opacity:.93}
-    .org-node {position:absolute;width:260px;height:121px;display:flex;flex-direction:column;gap:5px;padding:0;border:0;background:transparent;color:var(--white);text-align:left;transition:filter .15s}
-    .org-node:hover {filter:brightness(1.12)}
-    .org-node:focus-visible {outline:3px solid var(--gold);outline-offset:5px;border-radius:10px}
-    .node-meta {height:24px;display:flex;justify-content:space-between;align-items:center;padding:0 5px;gap:6px}
-    .node-code {font-size:11px;font-weight:900;letter-spacing:.14em;background:var(--gold);color:var(--navy);border-radius:5px;padding:2px 7px;line-height:19px}
-    .node-sigle {font-size:10px;letter-spacing:.1em;font-weight:800;color:var(--gold);background:var(--navy);padding:2px 5px;border-radius:3px}
-    .node-box {position:relative;flex:1;border:1.5px solid var(--gold);border-radius:10px;background:var(--navy);padding:10px 31px 10px 13px;display:flex;flex-direction:column;justify-content:center;box-shadow:0 6px 0 rgba(255,206,62,.07);min-height:0}
-    .node-class {font-size:9px;line-height:1.4;font-weight:880;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:5px}
-    .node-name {font-size:12px;line-height:1.27;font-weight:800;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
-    .node-toggle {position:absolute;right:7px;top:50%;transform:translateY(-50%);width:22px;height:22px;display:grid;place-items:center;border:1px solid var(--gold);border-radius:50%;color:var(--gold);font-size:17px;font-weight:750;line-height:1}
-    .node-count {position:absolute;right:7px;bottom:7px;font-size:9px;color:var(--mute)}
-    .org-node.kind-A .node-box {background:var(--gold);color:var(--navy)}
-    .org-node.kind-A .node-class,.org-node.kind-A .node-toggle {color:var(--navy)}
-    .org-node.kind-A .node-toggle {border-color:var(--navy)}
-    .org-node.kind-B.coordinateur .node-box {border-style:dashed}
-    .org-node.kind-B.annexe .node-box {background:var(--gold);color:var(--navy)}
-    .org-node.kind-B.annexe .node-class,.org-node.kind-B.annexe .node-toggle {color:var(--navy)}
-    .org-node.kind-B.annexe .node-toggle {border-color:var(--navy)}
-    .org-node.kind-C .node-box {border-color:rgba(255,255,255,.64);background:rgba(255,255,255,.045)}
-    .org-node.kind-C .node-class {color:rgba(255,255,255,.78)}
-    .org-node.selected .node-box {outline:3px solid var(--gold);outline-offset:3px;box-shadow:0 0 0 8px rgba(255,206,62,.12)}
-    .org-node.muted {opacity:.27}
-    .org-node.match .node-meta {filter:drop-shadow(0 0 5px var(--gold))}
-    .canvas-hint {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid rgba(255,206,62,.21);font-size:11px;color:var(--mute)}
-    .canvas-hint strong {color:var(--gold)}
-    .outline-view {display:none;overflow:auto;max-height:clamp(490px,65vh,830px);padding:19px;background:radial-gradient(circle at 90% 8%,rgba(255,206,62,.07),transparent 45%)}
-    .outline-view.active {display:block}
-    .viewport.hidden {display:none}
-    .outline-list {list-style:none;padding:0;margin:0}
-    .outline-entry {position:relative;margin:0 0 10px;padding-left:clamp(0px,calc(var(--depth) * 21px),84px)}
-    .outline-entry::before {content:"";position:absolute;top:-9px;bottom:-12px;left:calc(var(--depth) * 21px + 2px);border-left:1px solid var(--stroke)}
-    .outline-button {position:relative;display:flex;align-items:center;gap:11px;text-align:left;width:100%;border:1px solid var(--stroke);border-radius:11px;padding:11px 13px;color:var(--white);background:rgba(255,255,255,.025);min-width:0}
-    .outline-button:hover {border-color:var(--gold);background:var(--soft-gold)}
-    .outline-button.selected {border-color:var(--gold);background:var(--soft-gold)}
-    .outline-code {flex:0 0 58px;text-align:center;padding:5px 2px;background:var(--gold);color:var(--navy);border-radius:6px;font-size:10px;font-weight:880}
-    .outline-text {min-width:0;flex:1}
-    .outline-text b {font-size:11px;color:var(--gold);display:block;letter-spacing:.075em}
-    .outline-text span {font-size:12px;font-weight:700;line-height:1.35;display:block}
-    .outline-chevron {flex:0 0 20px;color:var(--gold);font-size:20px;text-align:center}
-    .outline-button.kind-A,.outline-button.annexe {background:var(--gold);color:var(--navy)}
-    .outline-button.kind-A .outline-code,.outline-button.annexe .outline-code {background:var(--navy);color:var(--gold)}
-    .outline-button.kind-A .outline-text b,.outline-button.annexe .outline-text b,.outline-button.kind-A .outline-chevron,.outline-button.annexe .outline-chevron {color:var(--navy)}
-    .footnote {display:flex;justify-content:space-between;gap:15px;align-items:center;border-top:1px solid var(--stroke);margin-top:27px;padding:19px 2px;font-size:11px;color:var(--mute)}
-    .footnote b {color:var(--gold)}
-    @media(max-width:1170px){.workspace{grid-template-columns:265px minmax(0,1fr)}.hero{grid-template-columns:1fr}.summary{max-width:460px}.sidebar .panel{border-radius:13px}}
-    @media(max-width:860px){.shell{padding:0 16px 28px}.topbar{padding:15px 0}.hero{padding:29px 0 24px;gap:19px}.workspace{grid-template-columns:minmax(0,1fr)}.sidebar{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sidebar>.panel:nth-child(2){display:none}.sidebar>.panel:nth-child(3){grid-column:1 / -1}.region-tabs{gap:8px}.region-tab{padding:13px 12px}.region-arrow{display:none}.metric{padding:16px 12px}.canvas-bar{padding:12px}.viewport,.outline-view{height:62vh;max-height:none}.tool-btn{font-size:11px;padding:8px 10px}.canvas-sub{display:none}}
-    @media(max-width:570px){.toplink{display:none}.hero::after{top:30px}.summary{gap:7px}.metric{padding:14px 9px}.metric span{font-size:9px}.region-tabs{grid-template-columns:1fr}.region-tab{gap:10px}.region-arrow{display:grid}.sidebar{grid-template-columns:1fr}.sidebar>.panel:nth-child(3){grid-column:auto}.toolbar{display:flex}.tools-left{width:100%}.tools-right{width:100%}.canvas-bar{flex-wrap:wrap}.outline-view{padding:12px}.outline-entry{padding-left:clamp(0px,calc(var(--depth) * 13px),52px)}.outline-entry::before{left:calc(var(--depth) * 13px + 2px)}.outline-code{flex-basis:47px}.outline-button{gap:8px;padding:10px 8px}.outline-text span{font-size:11px}.footnote{flex-direction:column;align-items:flex-start}}
-    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
-    @media print {body{background:var(--navy);-webkit-print-color-adjust:exact;print-color-adjust:exact}.shell{padding:0 12mm}.topbar,.toplink,.sidebar,.toolbar,.canvas-bar,.canvas-hint,.footnote,.region-tabs,.summary{display:none!important}.hero{display:block;padding:12mm 0 6mm}.hero h1{font-size:30px}.workspace{display:block}.canvas-card{border:0}.viewport{display:none!important}.outline-view{display:block!important;max-height:none;overflow:visible;padding:0}.outline-entry{break-inside:avoid;margin-bottom:5px}.outline-button{padding:6px 8px}.outline-button .outline-text span{font-size:10px}.outline-chevron{display:none}}
+    :root {
+      --blue: #002b59;
+      --yellow: #ffce3e;
+      --white: #ffffff;
+      --line: rgba(255,206,62,.65);
+      --light-line: rgba(255,255,255,.35);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; min-width: 320px; background: var(--blue); color: var(--white);
+      font-family: "Poppins", Arial, sans-serif; font-size: 14px; line-height: 1.6;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, a:focus-visible {
+      outline: 2px solid var(--yellow); outline-offset: 3px;
+    }
+    .container { max-width: 1360px; margin: 0 auto; padding: 30px 24px 56px; }
+    .page-header { border-bottom: 2px solid var(--yellow); padding-bottom: 24px; }
+    .header-line { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+    .site-id { color: var(--yellow); font-size: 10px; font-weight: 700; letter-spacing: .13em; margin-bottom: 8px; }
+    h1 { font-size: 20px; line-height: 1.4; font-weight: 700; margin: 0; color: var(--white); }
+    .site-link { color: var(--yellow); font-size: 12px; text-decoration: underline; text-underline-offset: 3px; flex: none; }
+    .introduction { margin: 12px 0 0; font-size: 12px; line-height: 1.7; color: var(--white); }
+    .totals { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 20px 0 0; padding: 0; list-style: none; font-size: 12px; }
+    .totals strong { color: var(--yellow); font-size: 14px; margin-right: 5px; }
+
+    .controls { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 14px; margin: 28px 0 24px; }
+    .search-group { flex: 1 1 340px; min-width: 0; max-width: 540px; }
+    label { display: block; color: var(--yellow); font-size: 12px; font-weight: 600; margin-bottom: 7px; }
+    .search-line { display: flex; gap: 8px; }
+    .search {
+      width: 100%; min-width: 0; background: var(--blue); color: var(--white);
+      border: 1px solid var(--yellow); border-radius: 4px; font-size: 14px;
+      padding: 11px 12px; height: 46px;
+    }
+    .search::placeholder { color: rgba(255,255,255,.8); }
+    .action {
+      background: var(--blue); color: var(--yellow); border: 1px solid var(--yellow);
+      border-radius: 4px; padding: 10px 14px; font-size: 12px; font-weight: 600;
+      min-height: 42px; white-space: nowrap;
+    }
+    .action:hover { background: var(--yellow); color: var(--blue); }
+    .action:disabled { opacity: .55; cursor: default; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .search-status { margin: 7px 0 0; font-size: 12px; color: var(--white); min-height: 20px; }
+
+    .columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
+    .group { min-width: 0; border: 1px solid var(--yellow); }
+    .group-header { padding: 18px; border-bottom: 1px solid var(--yellow); }
+    .group-code { color: var(--yellow); font-weight: 700; font-size: 10px; letter-spacing: .08em; }
+    .group-title {
+      font-size: 16px; line-height: 1.5; font-weight: 700; color: var(--white);
+      margin: 8px 0 10px; overflow-wrap: anywhere;
+    }
+    .group-summary { margin: 0; font-size: 12px; color: var(--white); }
+    .group-tree { padding: 16px 16px 18px 20px; }
+    .tree-list { list-style: none; padding: 0; margin: 0; }
+    .tree-item { position: relative; min-width: 0; }
+    .tree-item + .tree-item { margin-top: 13px; }
+    .tree-children {
+      list-style: none; padding: 12px 0 2px 18px; margin: 0 0 0 12px;
+      border-left: 1px solid var(--line);
+    }
+    .tree-children > .tree-item::before {
+      content: ""; position: absolute; width: 12px; height: 1px;
+      background: var(--yellow); left: -18px; top: 42px;
+    }
+    .node-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 0 0 5px 1px; font-size: 10px; font-weight: 600; color: var(--yellow); }
+    .node-card {
+      width: 100%; display: flex; align-items: center; text-align: left;
+      justify-content: space-between; gap: 12px; padding: 11px 13px;
+      background: var(--blue); border: 1px solid var(--yellow);
+      color: var(--white); border-radius: 4px; min-width: 0;
+    }
+    .node-card.is-sector { font-size: 14px; font-weight: 600; }
+    .node-card.is-perimeter { font-size: 12px; font-weight: 500; border-color: var(--light-line); }
+    button.node-card:hover, button.node-card[aria-expanded="true"] { border-color: var(--yellow); background: rgba(255,206,62,.08); }
+    .node-title { overflow-wrap: anywhere; min-width: 0; }
+    .expand-symbol {
+      color: var(--yellow); font-size: 18px; font-weight: 500;
+      flex: 0 0 20px; text-align: center; line-height: 1;
+    }
+    .leaf-marker { display: block; width: 6px; height: 6px; border: 1px solid var(--yellow); flex: 0 0 6px; }
+    .is-match .node-card { border: 2px solid var(--yellow); }
+    .is-match .node-title { color: var(--yellow); }
+    .empty { margin: 0; padding: 12px 0; font-size: 12px; }
+    .help { margin: 18px 0 0; font-size: 12px; line-height: 1.7; color: var(--white); }
+    .footer { border-top: 1px solid var(--line); margin-top: 36px; padding-top: 15px; font-size: 10px; color: var(--white); }
+    .screen-reader-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+    @media (max-width: 850px) {
+      .container { padding: 24px 16px 36px; }
+      .columns { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+    }
+    @media (max-width: 480px) {
+      .header-line { flex-direction: column; gap: 8px; }
+      .controls { gap: 12px; }
+      .actions { width: 100%; }
+      .actions .action { flex: 1 1 auto; }
+      .group-header { padding: 14px; }
+      .group-tree { padding: 12px 12px 14px 14px; }
+      .tree-children { padding-left: 12px; margin-left: 8px; }
+      .tree-children > .tree-item::before { left: -12px; width: 8px; }
+      .node-card { padding: 10px; }
+    }
+    @media print {
+      body { background: white; color: black; }
+      .container { max-width: none; padding: 0; }
+      .controls, .site-link, .help { display: none; }
+      .page-header, .group, .group-header { border-color: black; }
+      .group-title, .introduction, .group-summary, .node-title, .totals, .footer { color: black; }
+      .node-card, .node-card.is-perimeter { color: black; background: white; border-color: black; }
+      .node-meta, .group-code { color: black; }
+      .columns { gap: 12px; }
+      .group { break-inside: avoid-page; }
+    }
   </style>
 </head>
 <body>
-<div class="topline"></div>
-<div class="shell">
-  <header class="topbar">
-    <div class="brand"><div class="brand-mark" aria-hidden="true">50k</div><div><span class="brand-eyebrow">Architecture territoriale</span><span class="brand-sub">Référentiel 50000 / Organigramme interactif</span></div></div>
-    <a class="toplink" href="https://github.com/letrainduraslebol/50000" target="_blank" rel="noopener noreferrer">Projet GitHub ↗</a>
-  </header>
-  <main>
-    <section class="hero" aria-labelledby="page-title">
-      <div><div class="kicker">Référentiel territorial · A / B / C</div><h1 id="page-title">Les <span>périmètres.</span></h1><p class="intro">Une lecture structurée et interactive des regroupements, secteurs et périmètres. Dépliez les branches pour parcourir les rattachements, recherchez un code et explorez chaque niveau sans perdre le fil de la hiérarchie.</p></div>
-      <div class="summary" aria-label="Composition du référentiel"><div class="metric"><strong>02</strong><span>Regroupements</span></div><div class="metric"><strong>18</strong><span>Secteurs</span></div><div class="metric"><strong>54</strong><span>Périmètres</span></div></div>
-    </section>
-    <div class="section-heading"><h2>01 — Choisir un regroupement</h2><span class="micro">Sélectionnez une zone pour explorer son organigramme</span></div>
-    <nav class="region-tabs" id="regions" aria-label="Regroupements des mobilités"></nav>
-    <section class="workspace" aria-label="Explorateur du référentiel">
-      <aside class="sidebar" aria-label="Recherche et informations">
-        <section class="panel"><div class="panel-head"><div><div class="panel-label">Navigation</div><div class="panel-title">Trouver un élément</div></div></div><div class="panel-body"><label class="sr-only" for="search">Chercher un code, sigle, ville ou intitulé</label><div class="search-wrap"><input type="search" id="search" class="search" placeholder="Code, sigle, ville…" autocomplete="off" /></div><p class="search-foot" id="search-foot">74 entrées dans le référentiel · Recherche globale</p><div class="search-results" id="search-results" aria-live="polite"></div></div></section>
-        <section class="panel"><div class="panel-head"><div><div class="panel-label">Mode d’emploi</div><div class="panel-title">Lire le schéma</div></div></div><div class="panel-body"><div class="legend-item"><i class="legend-swatch root"></i><span>Regroupement<small>Structure de référence · Niveau A</small></span></div><div class="legend-item"><i class="legend-swatch"></i><span>Secteur gestionnaire<small>Rattachement principal · Niveau B</small></span></div><div class="legend-item"><i class="legend-swatch coordinateur"></i><span>Secteur coordinateur<small>Rattachement secondaire · Niveau B</small></span></div><div class="legend-item"><i class="legend-swatch annexe"></i><span>Secteur annexe<small>Rattachement complémentaire · Niveau B</small></span></div><div class="legend-item"><i class="legend-swatch perimetre"></i><span>Périmètre<small>Gestionnaire, coordinateur, annexe ou local · Niveau C</small></span></div></div><div class="panel-footer">Les traits relient les codes selon leur rattachement dans le document source.</div></section>
-        <section class="panel"><div class="details-head"><div class="panel-label">Fiche d’élément</div><div class="panel-title">Élément sélectionné</div></div><div class="details" id="details" aria-live="polite"></div></section>
-      </aside>
-      <div class="organigram">
-        <div class="toolbar"><div class="tools-left"><button class="tool-btn current" id="view-graph" type="button" aria-pressed="true">◈ Organigramme</button><button class="tool-btn" id="view-list" type="button" aria-pressed="false">☷ Vue liste</button><button class="tool-btn" id="expand" type="button" title="Déplier toutes les branches du regroupement">Tout déplier</button><button class="tool-btn" id="collapse" type="button" title="Replier tous les niveaux">Tout replier</button></div><div class="tools-right"><button class="tool-btn icon-only" id="zoom-out" title="Dézoomer" aria-label="Dézoomer">−</button><span class="zoom-label" id="zoom-value">90 %</span><button class="tool-btn icon-only" id="zoom-in" title="Zoomer" aria-label="Zoomer">+</button><button class="tool-btn" id="recenter" type="button">Recentrer</button><button class="tool-btn primary" id="print" type="button">Imprimer / PDF ↗</button></div></div>
-        <div class="canvas-card"><div class="canvas-bar"><div class="canvas-title" id="graph-heading">Grand Sud-Est</div><div class="canvas-sub" id="graph-sub">9 secteurs · 27 périmètres</div></div><div class="viewport" id="viewport" tabindex="0" aria-label="Organigramme déroulant, déplacer pour explorer"><div class="scene" id="scene"><div class="graph-inner" id="graph-inner"><svg class="links" id="links" aria-hidden="true"></svg><div id="graph-nodes"></div></div></div></div><div class="outline-view" id="outline-view" aria-label="Arborescence hiérarchique"></div><div class="canvas-hint"><span><strong>Astuce :</strong> cliquez sur une carte pour ouvrir sa branche et consulter sa fiche.</span><span id="visible-count" aria-live="polite"></span></div></div>
+  <div class="container">
+    <header class="page-header">
+      <div class="header-line">
+        <div>
+          <div class="site-id">50000 · RÉFÉRENTIEL</div>
+          <h1>Les notions de référence</h1>
+        </div>
+        <a class="site-link" href="https://github.com/letrainduraslebol/50000" target="_blank" rel="noopener noreferrer">Code source</a>
       </div>
-    </section>
-  </main>
-  <footer class="footnote"><span><b>50000</b> · Organisation territoriale interactive · Sources : « 50000-0Y100 – Les périmètres »</span><span>Codes et rattachements reproduits depuis le document de référence.</span></footer>
-</div>
-<script>
-'use strict';
-const DATA = [{"uid":"A51000","code":"51000","parentCode":"50000","level":"A","familyCode":"A5000","sigle":"RMGSE","label":"REGROUPEMENT DES MOBILITÉS DU GRAND SUD-EST","parent":null},{"uid":"B51100","code":"51100","parentCode":"51000","level":"B","familyCode":"B5000","sigle":"SGVRP","label":"SECTEUR GESTIONNAIRE DE LA VALLÉE DU RHÔNE ET DES PRÉALPES","parent":"A51000"},{"uid":"C51100","code":"51100","parentCode":"51100","level":"C","familyCode":"C5000","sigle":"PGLYN","label":"PÉRIMÈTRE GESTIONNAIRE DE LYON","parent":"B51100"},{"uid":"C51120","code":"51120","parentCode":"51100","level":"C","familyCode":"C5000","sigle":"PLGBL","label":"PÉRIMÈTRE LOCAL DE GRENOBLE","parent":"B51100"},{"uid":"C51135","code":"51135","parentCode":"51100","level":"C","familyCode":"C5000","sigle":"PLSET","label":"PÉRIMÈTRE LOCAL DE SAINT-ÉTIENNE","parent":"B51100"},{"uid":"B52100","code":"52100","parentCode":"51100","level":"B","familyCode":"B5000","sigle":"SCTSL","label":"SECTEUR COORDINATEUR DES TERRES SAVOYARDES ET LÉMANIQUES","parent":"B51100"},{"uid":"C52100","code":"52100","parentCode":"52100","level":"C","familyCode":"C5000","sigle":"PCACY","label":"PÉRIMÈTRE COORDINATEUR D’ANNECY","parent":"B52100"},{"uid":"C52120","code":"52120","parentCode":"52100","level":"C","familyCode":"C5000","sigle":"PLCHY","label":"PÉRIMÈTRE LOCAL DE CHAMBÉRY","parent":"B52100"},{"uid":"C52135","code":"52135","parentCode":"52100","level":"C","familyCode":"C5000","sigle":"PLASS","label":"PÉRIMÈTRE LOCAL D’ANNEMASSE","parent":"B52100"},{"uid":"B51200","code":"51200","parentCode":"51000","level":"B","familyCode":"B5000","sigle":"SGRML","label":"SECTEUR GESTIONNAIRE DU RHÔNE MÉDITERRANÉEN ET DU LANGUEDOC","parent":"A51000"},{"uid":"C51200","code":"51200","parentCode":"51200","level":"C","familyCode":"C5000","sigle":"PGAVG","label":"PÉRIMÈTRE GESTIONNAIRE D’AVIGNON","parent":"B51200"},{"uid":"C51220","code":"51220","parentCode":"51200","level":"C","familyCode":"C5000","sigle":"PLNMS","label":"PÉRIMÈTRE LOCAL DE NÎMES","parent":"B51200"},{"uid":"C51235","code":"51235","parentCode":"51200","level":"C","familyCode":"C5000","sigle":"PLNBN","label":"PÉRIMÈTRE LOCAL DE NARBONNE","parent":"B51200"},{"uid":"B52200","code":"52200","parentCode":"51200","level":"B","familyCode":"B5000","sigle":"SCALA","label":"SECTEUR COORDINATEUR DES ALPES ET DU LITTORAL AZURÉEN","parent":"B51200"},{"uid":"C52200","code":"52200","parentCode":"52200","level":"C","familyCode":"C5000","sigle":"PCTLN","label":"PÉRIMÈTRE COORDINATEUR DE TOULON","parent":"B52200"},{"uid":"C52220","code":"52220","parentCode":"52200","level":"C","familyCode":"C5000","sigle":"PLNCE","label":"PÉRIMÈTRE LOCAL DE NICE","parent":"B52200"},{"uid":"C52235","code":"52235","parentCode":"52200","level":"C","familyCode":"C5000","sigle":"PLGAP","label":"PÉRIMÈTRE LOCAL DE GAP","parent":"B52200"},{"uid":"B51300","code":"51300","parentCode":"51000","level":"B","familyCode":"B5000","sigle":"SGMAL","label":"SECTEUR GESTIONNAIRE DES MASSIFS AUVERGNATS ET LOZÉRIENS","parent":"A51000"},{"uid":"C51300","code":"51300","parentCode":"51300","level":"C","familyCode":"C5000","sigle":"PGCLF","label":"PÉRIMÈTRE GESTIONNAIRE DE CLERMONT-FERRAND","parent":"B51300"},{"uid":"C51320","code":"51320","parentCode":"51300","level":"C","familyCode":"C5000","sigle":"PLMLC","label":"PÉRIMÈTRE LOCAL DE MONTLUÇON","parent":"B51300"},{"uid":"C51335","code":"51335","parentCode":"51300","level":"C","familyCode":"C5000","sigle":"PLMDE","label":"PÉRIMÈTRE LOCAL DE MENDE","parent":"B51300"},{"uid":"B52300","code":"52300","parentCode":"51300","level":"B","familyCode":"B5000","sigle":"SCPBM","label":"SECTEUR COORDINATEUR DES PLATEAUX BOURGUIGNONS ET DU MORVAN","parent":"B51300"},{"uid":"C52300","code":"52300","parentCode":"52300","level":"C","familyCode":"C5000","sigle":"PCDJN","label":"PÉRIMÈTRE COORDINATEUR DE DIJON","parent":"B52300"},{"uid":"C52320","code":"52320","parentCode":"52300","level":"C","familyCode":"C5000","sigle":"PLNVS","label":"PÉRIMÈTRE LOCAL DE NEVERS","parent":"B52300"},{"uid":"C52335","code":"52335","parentCode":"52300","level":"C","familyCode":"C5000","sigle":"PLLRM","label":"PÉRIMÈTRE LOCAL DE LAROCHE-MIGENNES","parent":"B52300"},{"uid":"B54300","code":"54300","parentCode":"52300","level":"B","familyCode":"B5000","sigle":"SACHL","label":"SECTEUR ANNEXE DES LA CHAMPAGNE ET DE LA LORRAINE","parent":"B52300"},{"uid":"C54300","code":"54300","parentCode":"54300","level":"C","familyCode":"C5000","sigle":"PARMS","label":"PÉRIMÈTRE ANNEXE DE REIMS","parent":"B54300"},{"uid":"C54320","code":"54320","parentCode":"54300","level":"C","familyCode":"C5000","sigle":"PLNCY","label":"PÉRIMÈTRE LOCAL DE NANCY","parent":"B54300"},{"uid":"C54335","code":"54335","parentCode":"54300","level":"C","familyCode":"C5000","sigle":"PLCCY","label":"PÉRIMÈTRE LOCAL DE CULMONT-CHALINDREY","parent":"B54300"},{"uid":"B51400","code":"51400","parentCode":"51000","level":"B","familyCode":"B5000","sigle":"SGHJA","label":"SECTEUR GESTIONNAIRE DU HAUT-JURA ET DE L’ALSACE","parent":"A51000"},{"uid":"C51400","code":"51400","parentCode":"51400","level":"C","familyCode":"C5000","sigle":"PGBSN","label":"PÉRIMÈTRE GESTIONNAIRE DE BESANÇON","parent":"B51400"},{"uid":"C51420","code":"51420","parentCode":"51400","level":"C","familyCode":"C5000","sigle":"PLBFT","label":"PÉRIMÈTRE LOCAL DE BELFORT","parent":"B51400"},{"uid":"C51435","code":"51435","parentCode":"51400","level":"C","familyCode":"C5000","sigle":"PLFSN","label":"PÉRIMÈTRE LOCAL DE FRASNE","parent":"B51400"},{"uid":"B53400","code":"53400","parentCode":"51400","level":"B","familyCode":"B5000","sigle":"SAPVM","label":"SECTEUR ANNEXE DES PARCS VOSGIENS ET DE LA MOSELLE","parent":"B51400"},{"uid":"C53400","code":"53400","parentCode":"53400","level":"C","familyCode":"C5000","sigle":"PAMTZ","label":"PÉRIMÈTRE ANNEXE DE METZ","parent":"B53400"},{"uid":"C53420","code":"53420","parentCode":"53400","level":"C","familyCode":"C5000","sigle":"PLEPL","label":"PÉRIMÈTRE LOCAL D’ÉPINAL","parent":"B53400"},{"uid":"C53435","code":"53435","parentCode":"53400","level":"C","familyCode":"C5000","sigle":"PLMHE","label":"PÉRIMÈTRE LOCAL DE MULHOUSE","parent":"B53400"},{"uid":"A51500","code":"51500","parentCode":"50000","level":"A","familyCode":"A5000","sigle":"RMCGO","label":"REGROUPEMENT DES MOBILITÉS DU CENTRE ET DU GRAND-OUEST","parent":null},{"uid":"B51600","code":"51600","parentCode":"51500","level":"B","familyCode":"B5000","sigle":"SGBAP","label":"SECTEUR GESTIONNAIRE DU BASSIN AQUITAIN ET DES PYRÉNÉES","parent":"A51500"},{"uid":"C51600","code":"51600","parentCode":"51600","level":"C","familyCode":"C5000","sigle":"PGTLS","label":"PÉRIMÈTRE GESTIONNAIRE DE TOULOUSE","parent":"B51600"},{"uid":"C51620","code":"51620","parentCode":"51600","level":"C","familyCode":"C5000","sigle":"PLDAX","label":"PÉRIMÈTRE LOCAL DE DAX","parent":"B51600"},{"uid":"C51635","code":"51635","parentCode":"51600","level":"C","familyCode":"C5000","sigle":"PLFOX","label":"PÉRIMÈTRE LOCAL DE FOIX","parent":"B51600"},{"uid":"B52600","code":"52600","parentCode":"51600","level":"B","familyCode":"B5000","sigle":"SCTLP","label":"SECTEUR COORDINATEUR DES TERRES DU LIMOUSIN ET DU PÉRIGORD","parent":"B51600"},{"uid":"C52600","code":"52600","parentCode":"52600","level":"C","familyCode":"C5000","sigle":"PCLMG","label":"PÉRIMÈTRE COORDINATEUR DE LIMOGES","parent":"B52600"},{"uid":"C52620","code":"52620","parentCode":"52600","level":"C","familyCode":"C5000","sigle":"PLBLG","label":"PÉRIMÈTRE LOCAL DE BRIVE-LA-GAILLARDE","parent":"B52600"},{"uid":"C52635","code":"52635","parentCode":"52600","level":"C","familyCode":"C5000","sigle":"PLPGX","label":"PÉRIMÈTRE LOCAL DE PÉRIGUEUX","parent":"B52600"},{"uid":"B51700","code":"51700","parentCode":"51500","level":"B","familyCode":"B5000","sigle":"SGLAP","label":"SECTEUR GESTIONNAIRE DU LITTORAL ATLANTIQUE ET DU POITOU","parent":"A51500"},{"uid":"C51700","code":"51700","parentCode":"51700","level":"C","familyCode":"C5000","sigle":"PGBDX","label":"PÉRIMÈTRE GESTIONNAIRE DE BORDEAUX","parent":"B51700"},{"uid":"C51720","code":"51720","parentCode":"51700","level":"C","familyCode":"C5000","sigle":"PLPTS","label":"PÉRIMÈTRE LOCAL DE POITIERS","parent":"B51700"},{"uid":"C51735","code":"51735","parentCode":"51700","level":"C","familyCode":"C5000","sigle":"PLSTS","label":"PÉRIMÈTRE LOCAL DE SAINTES","parent":"B51700"},{"uid":"B52700","code":"52700","parentCode":"51700","level":"B","familyCode":"B5000","sigle":"SCVLB","label":"SECTEUR COORDINATEUR DE LA VALLÉE DE LA LOIRE ET DE LA BEAUCE","parent":"B51700"},{"uid":"C52700","code":"52700","parentCode":"52700","level":"C","familyCode":"C5000","sigle":"PCTRS","label":"PÉRIMÈTRE COORDINATEUR DE TOURS","parent":"B52700"},{"uid":"C52720","code":"52720","parentCode":"52700","level":"C","familyCode":"C5000","sigle":"PLOLS","label":"PÉRIMÈTRE LOCAL D’ORLÉANS","parent":"B52700"},{"uid":"C52735","code":"52735","parentCode":"52700","level":"C","familyCode":"C5000","sigle":"PLCHS","label":"PÉRIMÈTRE LOCAL DE CHARTRES","parent":"B52700"},{"uid":"B51800","code":"51800","parentCode":"51500","level":"B","familyCode":"B5000","sigle":"SGMAM","label":"SECTEUR GESTIONNAIRE DU MASSIF ARMORICAIN ET DU MAINE","parent":"A51500"},{"uid":"C51800","code":"51800","parentCode":"51800","level":"C","familyCode":"C5000","sigle":"PGRNS","label":"PÉRIMÈTRE GESTIONNAIRE DE RENNES","parent":"B51800"},{"uid":"C51820","code":"51820","parentCode":"51800","level":"C","familyCode":"C5000","sigle":"PLBST","label":"PÉRIMÈTRE LOCAL DE BREST","parent":"B51800"},{"uid":"C51835","code":"51835","parentCode":"51800","level":"C","familyCode":"C5000","sigle":"PLLMS","label":"PÉRIMÈTRE LOCAL DU MANS","parent":"B51800"},{"uid":"B52800","code":"52800","parentCode":"51800","level":"B","familyCode":"B5000","sigle":"SCLOB","label":"SECTEUR COORDINATEUR DE LA LOIRE OCÉANE ET DE LA BRETAGNE","parent":"B51800"},{"uid":"C52800","code":"52800","parentCode":"52800","level":"C","familyCode":"C5000","sigle":"PCNTS","label":"PÉRIMÈTRE COORDINATEUR DE NANTES","parent":"B52800"},{"uid":"C52820","code":"52820","parentCode":"52800","level":"C","familyCode":"C5000","sigle":"PLQPR","label":"PÉRIMÈTRE LOCAL DE QUIMPER","parent":"B52800"},{"uid":"C52835","code":"52835","parentCode":"52800","level":"C","familyCode":"C5000","sigle":"PLAGS","label":"PÉRIMÈTRE LOCAL D’ANGERS","parent":"B52800"},{"uid":"B51900","code":"51900","parentCode":"51500","level":"B","familyCode":"B5000","sigle":"SGCNS","label":"SECTEUR GESTIONNAIRE DES CÔTES NORMANDES ET DE LA SEINE","parent":"A51500"},{"uid":"C51900","code":"51900","parentCode":"51900","level":"C","familyCode":"C5000","sigle":"PGCEN","label":"PÉRIMÈTRE GESTIONNAIRE DE CAEN","parent":"B51900"},{"uid":"C51920","code":"51920","parentCode":"51900","level":"C","familyCode":"C5000","sigle":"PLREN","label":"PÉRIMÈTRE LOCAL DE ROUEN","parent":"B51900"},{"uid":"C51935","code":"51935","parentCode":"51900","level":"C","familyCode":"C5000","sigle":"PLLHV","label":"PÉRIMÈTRE LOCAL DU HAVRE","parent":"B51900"},{"uid":"B52900","code":"52900","parentCode":"51900","level":"B","familyCode":"B5000","sigle":"SCPCO","label":"SECTEUR COORDINATEUR DE LA PICARDIE ET DE LA CÔTE-D'OPALE","parent":"B51900"},{"uid":"C52900","code":"52900","parentCode":"52900","level":"C","familyCode":"C5000","sigle":"PCAMS","label":"PÉRIMÈTRE COORDINATEUR D’AMIENS","parent":"B52900"},{"uid":"C52920","code":"52920","parentCode":"52900","level":"C","familyCode":"C5000","sigle":"PLARR","label":"PÉRIMÈTRE LOCAL D’ARRAS","parent":"B52900"},{"uid":"C52935","code":"52935","parentCode":"52900","level":"C","familyCode":"C5000","sigle":"PLLAN","label":"PÉRIMÈTRE LOCAL DE LAON","parent":"B52900"},{"uid":"B54900","code":"54900","parentCode":"52900","level":"B","familyCode":"B5000","sigle":"SAFLH","label":"SECTEUR ANNEXE DES FLANDRES ET DU HAINAUT","parent":"B52900"},{"uid":"C54900","code":"54900","parentCode":"54900","level":"C","familyCode":"C5000","sigle":"PADKQ","label":"PÉRIMÈTRE ANNEXE DE DUNKERQUE","parent":"B54900"},{"uid":"C54920","code":"54920","parentCode":"54900","level":"C","familyCode":"C5000","sigle":"PLDUA","label":"PÉRIMÈTRE LOCAL DE DOUAI","parent":"B54900"},{"uid":"C54935","code":"54935","parentCode":"54900","level":"C","familyCode":"C5000","sigle":"PLVCN","label":"PÉRIMÈTRE LOCAL DE VALENCIENNES","parent":"B54900"}];
-const BY_ID = new Map(DATA.map(n=>[n.uid,n]));
-const CHILDREN = new Map(DATA.map(n=>[n.uid,[]]));
-DATA.forEach(n=>{if(n.parent)CHILDREN.get(n.parent).push(n)});
-const ROOTS = DATA.filter(n=>n.level==='A');
-const ROOT_OF = n=>{while(n.parent)n=BY_ID.get(n.parent);return n};
-const KIND = n=>n.level==='A'?'regroupement':n.level==='C'?'périmètre':/SECTEUR GESTIONNAIRE/.test(n.label)?'gestionnaire':/SECTEUR COORDINATEUR/.test(n.label)?'coordinateur':'annexe';
-const SHORT = n=>n.label.replace(/^REGROUPEMENT DES MOBILITÉS DU\s*/,'').replace(/^SECTEUR (?:GESTIONNAIRE|COORDINATEUR|ANNEXE)\s*/,'').replace(/^PÉRIMÈTRE (?:GESTIONNAIRE|COORDINATEUR|ANNEXE|LOCAL)\s*/,'').replace(/^(DE LA |DES |DE L[’']|DE |DU |D[’'])/,'').trim();
-const norm = s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’']/g,' ');
-const h = s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
-const plural=(n,s)=>`${n} ${s}${n>1?'s':''}`;
-const allDescendants = n=>(CHILDREN.get(n.uid)||[]).flatMap(child=>[child,...allDescendants(child)]);
-const totalPerimeters = n=>allDescendants(n).filter(x=>x.level==='C').length;
-const expanded=new Set();
-const initialExpand = root=>{expanded.clear();expanded.add(root.uid);const manager=(CHILDREN.get(root.uid)||[])[0];if(manager){expanded.add(manager.uid);const coordinator=(CHILDREN.get(manager.uid)||[]).find(n=>n.level==='B');if(coordinator)expanded.add(coordinator.uid)}};
-const state={root:ROOTS[0].uid,selected:ROOTS[0].uid,view:window.matchMedia('(max-width:860px)').matches?'list':'graph',zoom:0.90,query:'',matchIds:new Set()};
-initialExpand(ROOTS[0]);
-const $=id=>document.getElementById(id);
-function visibleChildren(n){return expanded.has(n.uid)?CHILDREN.get(n.uid)||[]:[]}
-function branchPath(n){const a=[n];while(n.parent){n=BY_ID.get(n.parent);a.unshift(n)}return a}
-function currentRoot(){return BY_ID.get(state.root)}
-function getMatches(){const query=norm(state.query.trim());return query?DATA.filter(n=>norm([n.code,n.familyCode,n.sigle,n.label,SHORT(n)].join(' ')).includes(query)):[]}
-function typeTitle(n){return n.level==='A'?'Regroupement · Niveau A':n.level==='C'?n.label.split(' DE ')[0].split(' D’')[0]+' · Niveau C':'Secteur '+KIND(n)+' · Niveau B'}
-function selectNode(uid,{ensureVisible=false,skipScroll=false}={}){const n=BY_ID.get(uid);if(!n)return;const root=ROOT_OF(n);if(root.uid!==state.root){state.root=root.uid;initialExpand(root)}if(ensureVisible){for(const p of branchPath(n).slice(0,-1))expanded.add(p.uid)}state.selected=uid;render();if(ensureVisible&&!skipScroll&&state.view==='graph')requestAnimationFrame(()=>scrollToNode(uid))}
-function toggleNode(uid){const n=BY_ID.get(uid);if(CHILDREN.get(uid).length){if(expanded.has(uid))expanded.delete(uid);else expanded.add(uid)}state.selected=uid;render()}
-function renderTabs(){const root=currentRoot();$('regions').innerHTML=ROOTS.map(n=>`<button type="button" class="region-tab ${n.uid===root.uid?'active':''}" data-root="${h(n.uid)}" aria-pressed="${n.uid===root.uid}"><span class="region-left"><span class="region-id">${n.code} · ${h(n.sigle)}</span><span class="region-name">${h(SHORT(n))}</span><span class="region-count">${plural(allDescendants(n).filter(x=>x.level==='B').length,'secteur')} · ${plural(totalPerimeters(n),'périmètre')}</span></span><span class="region-arrow" aria-hidden="true">↗</span></button>`).join('')}
-function renderDetails(){const n=BY_ID.get(state.selected),path=branchPath(n);$('details').innerHTML=`<p class="details-type">${h(typeTitle(n))}</p><h3 class="details-name">${h(n.label)}</h3><div class="detail-codes"><span class="detail-chip"><strong>Code</strong> ${h(n.code)}</span><span class="detail-chip"><strong>Sigle</strong> ${h(n.sigle)}</span><span class="detail-chip"><strong>Classe</strong> ${h(n.familyCode)}</span>${n.parent?`<span class="detail-chip"><strong>Parent</strong> ${h(n.parentCode)}</span>`:''}</div><div class="panel-label">Chaîne de rattachement</div><ol class="breadcrumb">${path.map((p,i)=>`<li>${h(p.code)} · ${h(i===path.length-1?p.label:SHORT(p))}</li>`).join('')}</ol>${CHILDREN.get(n.uid).length?`<div style="margin-top:15px;font-size:11px;color:var(--mute)">${plural(CHILDREN.get(n.uid).length,'enfant direct')} · ${plural(totalPerimeters(n),'périmètre rattaché')}</div>`:''}`}
-function renderSearch(){const results=getMatches();state.matchIds=new Set(results.map(n=>n.uid));$('search-foot').textContent=state.query.trim()?`${plural(results.length,'résultat')} sur 74 entrées · Recherche globale`:'74 entrées dans le référentiel · Recherche globale';$('search-results').innerHTML=state.query.trim()?results.slice(0,12).map(n=>`<button type="button" class="result" data-result="${h(n.uid)}"><span><strong>${h(n.code)} · ${h(n.sigle)}</strong><small>${h(SHORT(n))}</small></span><span aria-hidden="true">↗</span></button>`).join('')+(results.length>12?`<small style="color:var(--mute)">+ ${results.length-12} autres résultats · affinez la recherche</small>`:'')+(results.length===0?'<small style="color:var(--gold)">Aucun résultat. Essayez un code ou une ville.</small>':''):''}
-function renderHeader(){const root=currentRoot();$('graph-heading').textContent=SHORT(root);$('graph-sub').textContent=`9 secteurs · 27 périmètres`;const graph=state.view==='graph';$('view-graph').classList.toggle('current',graph);$('view-list').classList.toggle('current',!graph);$('view-graph').setAttribute('aria-pressed',graph);$('view-list').setAttribute('aria-pressed',!graph);$('viewport').classList.toggle('hidden',!graph);$('outline-view').classList.toggle('active',!graph);$('zoom-value').textContent=`${Math.round(state.zoom*100)} %`;for(const id of ['zoom-out','zoom-in','recenter'])$(id).disabled=!graph}
-const NW=260,NH=121,GX=335,GY=27,PX=38,PY=40;
-function treeLayout(root){let coordinates=[],edges=[];function measure(n){const kids=visibleChildren(n);return Math.max(NH,kids.length?kids.reduce((acc,k)=>acc+measure(k),0)+(kids.length-1)*GY:NH)}
-  function place(n,depth,top){const kids=visibleChildren(n),total=measure(n);const x=PX+depth*GX,y=PY+top+(total-NH)/2;coordinates.push({n,x,y,depth});let cursor=top;for(const child of kids){const childHeight=measure(child);place(child,depth+1,cursor);edges.push([n.uid,child.uid]);cursor+=childHeight+GY}return total}
-  const ht=place(root,0,0);const maxDepth=Math.max(...coordinates.map(p=>p.depth));return {coordinates,edges,width:Math.max(730,PX*2+NW+maxDepth*GX),height:Math.max(450,PY*2+ht)}}
-let positions=new Map();
-function renderGraph(){const layout=treeLayout(currentRoot());positions=new Map(layout.coordinates.map(p=>[p.n.uid,p]));const ns=$('graph-nodes');ns.innerHTML=layout.coordinates.map(({n,x,y})=>{const children=CHILDREN.get(n.uid),kind=KIND(n),match=state.query&&state.matchIds.has(n.uid),muted=state.query&&!match&&!branchPath(n).some(p=>state.matchIds.has(p.uid))&&!allDescendants(n).some(p=>state.matchIds.has(p.uid));return `<button type="button" data-node="${h(n.uid)}" aria-label="${h(n.code+' '+n.label+(children.length?', cliquer pour déplier ou replier':''))}" aria-expanded="${children.length?expanded.has(n.uid):'false'}" class="org-node kind-${n.level} ${kind} ${n.uid===state.selected?'selected':''} ${muted?'muted':''} ${match?'match':''}" style="left:${x}px;top:${y}px"><span class="node-meta"><span class="node-code">${h(n.code)}</span><span class="node-sigle">${h(n.sigle)}</span></span><span class="node-box"><span class="node-class">${h(typeTitle(n).replace(' · Niveau '+n.level,''))}</span><span class="node-name" title="${h(n.label)}">${h(SHORT(n))}</span>${children.length?`<span class="node-toggle" aria-hidden="true">${expanded.has(n.uid)?'−':'+'}</span><span class="node-count" aria-hidden="true">${totalPerimeters(n)} P</span>`:''}</span></button>`}).join('');
-  const paths=layout.edges.map(([src,dst])=>{const a=positions.get(src),b=positions.get(dst),sx=a.x+NW,sy=a.y+NH/2,ex=b.x,ey=b.y+NH/2,m=sx+(ex-sx)*.53;return `<path d="M ${sx} ${sy} C ${m} ${sy}, ${m} ${ey}, ${ex} ${ey}"/><circle cx="${ex}" cy="${ey}" r="3"/>`}).join('');$('links').setAttribute('width',layout.width);$('links').setAttribute('height',layout.height);$('links').setAttribute('viewBox',`0 0 ${layout.width} ${layout.height}`);$('links').innerHTML=paths;
-  $('graph-inner').style.width=`${layout.width}px`;$('graph-inner').style.height=`${layout.height}px`;$('graph-inner').style.transform=`scale(${state.zoom})`;$('scene').style.width=`${Math.round(layout.width*state.zoom)}px`;$('scene').style.height=`${Math.round(layout.height*state.zoom)}px`;
-  $('visible-count').textContent=`${layout.coordinates.length} éléments visibles · ${DATA.filter(n=>ROOT_OF(n).uid===state.root).length} au total`;}
-function renderList(){const root=currentRoot(),items=[];const walk=(n,depth)=>{const children=CHILDREN.get(n.uid),kind=KIND(n),match=state.query&&state.matchIds.has(n.uid),muted=state.query&&!match&&!allDescendants(n).some(x=>state.matchIds.has(x.uid));items.push(`<li class="outline-entry" style="--depth:${Math.min(depth,4)}"><button type="button" data-node="${h(n.uid)}" aria-expanded="${children.length?expanded.has(n.uid):'false'}" class="outline-button kind-${n.level} ${kind} ${n.uid===state.selected?'selected':''}" style="${muted?'opacity:.4':''}"><span class="outline-code">${h(n.code)}</span><span class="outline-text"><b>${h(n.sigle)} · ${h(typeTitle(n).split(' · ')[0])}</b><span>${h(n.label)}</span></span><span class="outline-chevron" aria-hidden="true">${children.length?(expanded.has(n.uid)?'−':'+'):'·'}</span></button></li>`);if(expanded.has(n.uid))children.forEach(child=>walk(child,depth+1))};walk(root,0);$('outline-view').innerHTML=`<ul class="outline-list">${items.join('')}</ul>`;if(state.view==='list')$('visible-count').textContent=`${items.length} éléments visibles · ${DATA.filter(n=>ROOT_OF(n).uid===state.root).length} au total`}
-function render(){renderTabs();renderSearch();renderHeader();renderDetails();renderGraph();renderList()}
-function scrollToNode(uid){const p=positions.get(uid);if(!p)return;const stage=$('viewport');stage.scrollTo({left:Math.max(0,p.x*state.zoom-stage.clientWidth*.35),top:Math.max(0,p.y*state.zoom-stage.clientHeight*.35),behavior:'smooth'})}
-function setZoom(next){const stage=$('viewport'),old=state.zoom;const centerX=(stage.scrollLeft+stage.clientWidth/2)/old,centerY=(stage.scrollTop+stage.clientHeight/2)/old;state.zoom=Math.max(.45,Math.min(1.55,Math.round(next*20)/20));renderGraph();renderHeader();stage.scrollLeft=centerX*state.zoom-stage.clientWidth/2;stage.scrollTop=centerY*state.zoom-stage.clientHeight/2}
-function setView(view){state.view=view;render();if(view==='graph')requestAnimationFrame(()=>scrollToNode(state.selected))}
-function applySearch(value){state.query=value;const hits=getMatches();if(hits.length){const first=hits.find(n=>ROOT_OF(n).uid===state.root)||hits[0];state.selected=first.uid;const root=ROOT_OF(first);if(root.uid!==state.root){state.root=root.uid;initialExpand(root)}for(const n of hits.filter(n=>ROOT_OF(n).uid===state.root))for(const p of branchPath(n).slice(0,-1))expanded.add(p.uid)}render();if(hits.length&&state.view==='graph')requestAnimationFrame(()=>scrollToNode(state.selected))}
-$('regions').addEventListener('click',e=>{const b=e.target.closest('[data-root]');if(!b)return;state.root=b.dataset.root;state.selected=state.root;initialExpand(currentRoot());state.query='';$('search').value='';render();$('viewport').scrollTo({top:0,left:0})});
-function onNodeClick(e){const b=e.target.closest('[data-node]');if(b)toggleNode(b.dataset.node)}
-$('graph-nodes').addEventListener('click',onNodeClick);$('outline-view').addEventListener('click',onNodeClick);
-$('search-results').addEventListener('click',e=>{const b=e.target.closest('[data-result]');if(b){selectNode(b.dataset.result,{ensureVisible:true});if(state.view==='list'){const selected=$('outline-view').querySelector('.outline-button.selected');selected?.scrollIntoView({behavior:'smooth',block:'nearest'})}}});
-$('search').addEventListener('input',e=>applySearch(e.target.value));$('search').addEventListener('keydown',e=>{if(e.key==='Escape'){e.target.value='';applySearch('')}});
-$('view-graph').addEventListener('click',()=>setView('graph'));
-$('view-list').addEventListener('click',()=>setView('list'));
-$('expand').addEventListener('click',()=>{for(const n of DATA)if(ROOT_OF(n).uid===state.root)expanded.add(n.uid);render()});
-$('collapse').addEventListener('click',()=>{expanded.clear();expanded.add(state.root);render();$('viewport').scrollTo({left:0,top:0})});
-$('zoom-in').addEventListener('click',()=>setZoom(state.zoom+.1));$('zoom-out').addEventListener('click',()=>setZoom(state.zoom-.1));
-$('recenter').addEventListener('click',()=>{state.zoom=.9;render();$('viewport').scrollTo({left:0,top:0,behavior:'smooth'})});
-let restore=null;
-$('print').addEventListener('click',()=>{restore={view:state.view,expanded:new Set(expanded)};state.view='list';for(const n of DATA)if(ROOT_OF(n).uid===state.root)expanded.add(n.uid);render();requestAnimationFrame(()=>window.print())});
-window.addEventListener('afterprint',()=>{if(restore){state.view=restore.view;expanded.clear();for(const uid of restore.expanded)expanded.add(uid);restore=null;render()}});
-// Faire glisser les zones vides de l'organigramme ; laisser les cartes et la molette accessibles.
-let drag=null;const stage=$('viewport');stage.addEventListener('pointerdown',e=>{if(e.button!==0||e.target.closest('button'))return;drag={x:e.clientX,y:e.clientY,left:stage.scrollLeft,top:stage.scrollTop};stage.classList.add('dragging');stage.setPointerCapture(e.pointerId)});stage.addEventListener('pointermove',e=>{if(!drag)return;stage.scrollLeft=drag.left-(e.clientX-drag.x);stage.scrollTop=drag.top-(e.clientY-drag.y)});for(const evt of ['pointerup','pointercancel','lostpointercapture'])stage.addEventListener(evt,()=>{drag=null;stage.classList.remove('dragging')});
-stage.addEventListener('wheel',e=>{if(e.ctrlKey||e.metaKey){e.preventDefault();setZoom(state.zoom+(e.deltaY<0?.05:-.05))}},{passive:false});
-render();
-// Au premier affichage, placer le regroupement au centre de la fenêtre visible.
-if(state.view==='graph'){const p=positions.get(state.root),stage=$('viewport');if(p){stage.scrollLeft=Math.max(0,p.x*state.zoom-stage.clientWidth*.18);stage.scrollTop=Math.max(0,p.y*state.zoom-stage.clientHeight*.42)}}
-</script>
+      <p class="introduction">Regroupements des mobilités, secteurs et périmètres. Les branches suivent les rattachements du document de référence.</p>
+      <ul class="totals" aria-label="Nombre d'éléments du référentiel">
+        <li><strong>2</strong> regroupements</li>
+        <li><strong>18</strong> secteurs</li>
+        <li><strong>54</strong> périmètres</li>
+      </ul>
+    </header>
+
+    <main>
+      <div class="controls">
+        <div class="search-group">
+          <label for="search">Rechercher une notion</label>
+          <div class="search-line">
+            <input id="search" class="search" type="search" placeholder="Nom, ville, code ou sigle" autocomplete="off" aria-describedby="search-status">
+            <button class="action" id="clear-search" type="button" hidden>Effacer</button>
+          </div>
+          <p class="search-status" id="search-status" role="status" aria-live="polite">74 notions dans le référentiel</p>
+        </div>
+        <div class="actions">
+          <button class="action" id="expand-all" type="button">Tout déplier</button>
+          <button class="action" id="collapse-all" type="button">Tout replier</button>
+        </div>
+      </div>
+      <div id="columns" class="columns" aria-label="Organigrammes des regroupements"></div>
+      <p class="help">Pour consulter un secteur, cliquez sur son rectangle : les éléments rattachés s'affichent directement en dessous. Utilisez la recherche pour retrouver une notion dans les deux regroupements.</p>
+    </main>
+    <footer class="footer">Source : « 50000-0Y100 – Les périmètres ». Codes et rattachements conservés.</footer>
+  </div>
+
+  <script>
+    "use strict";
+    const DATA = [{"uid":"A51000","code":"51000","parentCode":"50000","level":"A","familyCode":"A5000","sigle":"RMGSE","label":"REGROUPEMENT DES MOBILITÉS DU GRAND SUD-EST","parent":null},{"uid":"B51100","code":"51100","parentCode":"51000","level":"B","familyCode":"B5000","sigle":"SGVRP","label":"SECTEUR GESTIONNAIRE DE LA VALLÉE DU RHÔNE ET DES PRÉALPES","parent":"A51000"},{"uid":"C51100","code":"51100","parentCode":"51100","level":"C","familyCode":"C5000","sigle":"PGLYN","label":"PÉRIMÈTRE GESTIONNAIRE DE LYON","parent":"B51100"},{"uid":"C51120","code":"51120","parentCode":"51100","level":"C","familyCode":"C5000","sigle":"PLGBL","label":"PÉRIMÈTRE LOCAL DE GRENOBLE","parent":"B51100"},{"uid":"C51135","code":"51135","parentCode":"51100","level":"C","familyCode":"C5000","sigle":"PLSET","label":"PÉRIMÈTRE LOCAL DE SAINT-ÉTIENNE","parent":"B51100"},{"uid":"B52100","code":"52100","parentCode":"51100","level":"B","familyCode":"B5000","sigle":"SCTSL","label":"SECTEUR COORDINATEUR DES TERRES SAVOYARDES ET LÉMANIQUES","parent":"B51100"},{"uid":"C52100","code":"52100","parentCode":"52100","level":"C","familyCode":"C5000","sigle":"PCACY","label":"PÉRIMÈTRE COORDINATEUR D’ANNECY","parent":"B52100"},{"uid":"C52120","code":"52120","parentCode":"52100","level":"C","familyCode":"C5000","sigle":"PLCHY","label":"PÉRIMÈTRE LOCAL DE CHAMBÉRY","parent":"B52100"},{"uid":"C52135","code":"52135","parentCode":"52100","level":"C","familyCode":"C5000","sigle":"PLASS","label":"PÉRIMÈTRE LOCAL D’ANNEMASSE","parent":"B52100"},{"uid":"B51200","code":"51200","parentCode":"51000","level":"B","familyCode":"B5000","sigle":"SGRML","label":"SECTEUR GESTIONNAIRE DU RHÔNE MÉDITERRANÉEN ET DU LANGUEDOC","parent":"A51000"},{"uid":"C51200","code":"51200","parentCode":"51200","level":"C","familyCode":"C5000","sigle":"PGAVG","label":"PÉRIMÈTRE GESTIONNAIRE D’AVIGNON","parent":"B51200"},{"uid":"C51220","code":"51220","parentCode":"51200","level":"C","familyCode":"C5000","sigle":"PLNMS","label":"PÉRIMÈTRE LOCAL DE NÎMES","parent":"B51200"},{"uid":"C51235","code":"51235","parentCode":"51200","level":"C","familyCode":"C5000","sigle":"PLNBN","label":"PÉRIMÈTRE LOCAL DE NARBONNE","parent":"B51200"},{"uid":"B52200","code":"52200","parentCode":"51200","level":"B","familyCode":"B5000","sigle":"SCALA","label":"SECTEUR COORDINATEUR DES ALPES ET DU LITTORAL AZURÉEN","parent":"B51200"},{"uid":"C52200","code":"52200","parentCode":"52200","level":"C","familyCode":"C5000","sigle":"PCTLN","label":"PÉRIMÈTRE COORDINATEUR DE TOULON","parent":"B52200"},{"uid":"C52220","code":"52220","parentCode":"52200","level":"C","familyCode":"C5000","sigle":"PLNCE","label":"PÉRIMÈTRE LOCAL DE NICE","parent":"B52200"},{"uid":"C52235","code":"52235","parentCode":"52200","level":"C","familyCode":"C5000","sigle":"PLGAP","label":"PÉRIMÈTRE LOCAL DE GAP","parent":"B52200"},{"uid":"B51300","code":"51300","parentCode":"51000","level":"B","familyCode":"B5000","sigle":"SGMAL","label":"SECTEUR GESTIONNAIRE DES MASSIFS AUVERGNATS ET LOZÉRIENS","parent":"A51000"},{"uid":"C51300","code":"51300","parentCode":"51300","level":"C","familyCode":"C5000","sigle":"PGCLF","label":"PÉRIMÈTRE GESTIONNAIRE DE CLERMONT-FERRAND","parent":"B51300"},{"uid":"C51320","code":"51320","parentCode":"51300","level":"C","familyCode":"C5000","sigle":"PLMLC","label":"PÉRIMÈTRE LOCAL DE MONTLUÇON","parent":"B51300"},{"uid":"C51335","code":"51335","parentCode":"51300","level":"C","familyCode":"C5000","sigle":"PLMDE","label":"PÉRIMÈTRE LOCAL DE MENDE","parent":"B51300"},{"uid":"B52300","code":"52300","parentCode":"51300","level":"B","familyCode":"B5000","sigle":"SCPBM","label":"SECTEUR COORDINATEUR DES PLATEAUX BOURGUIGNONS ET DU MORVAN","parent":"B51300"},{"uid":"C52300","code":"52300","parentCode":"52300","level":"C","familyCode":"C5000","sigle":"PCDJN","label":"PÉRIMÈTRE COORDINATEUR DE DIJON","parent":"B52300"},{"uid":"C52320","code":"52320","parentCode":"52300","level":"C","familyCode":"C5000","sigle":"PLNVS","label":"PÉRIMÈTRE LOCAL DE NEVERS","parent":"B52300"},{"uid":"C52335","code":"52335","parentCode":"52300","level":"C","familyCode":"C5000","sigle":"PLLRM","label":"PÉRIMÈTRE LOCAL DE LAROCHE-MIGENNES","parent":"B52300"},{"uid":"B54300","code":"54300","parentCode":"52300","level":"B","familyCode":"B5000","sigle":"SACHL","label":"SECTEUR ANNEXE DES LA CHAMPAGNE ET DE LA LORRAINE","parent":"B52300"},{"uid":"C54300","code":"54300","parentCode":"54300","level":"C","familyCode":"C5000","sigle":"PARMS","label":"PÉRIMÈTRE ANNEXE DE REIMS","parent":"B54300"},{"uid":"C54320","code":"54320","parentCode":"54300","level":"C","familyCode":"C5000","sigle":"PLNCY","label":"PÉRIMÈTRE LOCAL DE NANCY","parent":"B54300"},{"uid":"C54335","code":"54335","parentCode":"54300","level":"C","familyCode":"C5000","sigle":"PLCCY","label":"PÉRIMÈTRE LOCAL DE CULMONT-CHALINDREY","parent":"B54300"},{"uid":"B51400","code":"51400","parentCode":"51000","level":"B","familyCode":"B5000","sigle":"SGHJA","label":"SECTEUR GESTIONNAIRE DU HAUT-JURA ET DE L’ALSACE","parent":"A51000"},{"uid":"C51400","code":"51400","parentCode":"51400","level":"C","familyCode":"C5000","sigle":"PGBSN","label":"PÉRIMÈTRE GESTIONNAIRE DE BESANÇON","parent":"B51400"},{"uid":"C51420","code":"51420","parentCode":"51400","level":"C","familyCode":"C5000","sigle":"PLBFT","label":"PÉRIMÈTRE LOCAL DE BELFORT","parent":"B51400"},{"uid":"C51435","code":"51435","parentCode":"51400","level":"C","familyCode":"C5000","sigle":"PLFSN","label":"PÉRIMÈTRE LOCAL DE FRASNE","parent":"B51400"},{"uid":"B53400","code":"53400","parentCode":"51400","level":"B","familyCode":"B5000","sigle":"SAPVM","label":"SECTEUR ANNEXE DES PARCS VOSGIENS ET DE LA MOSELLE","parent":"B51400"},{"uid":"C53400","code":"53400","parentCode":"53400","level":"C","familyCode":"C5000","sigle":"PAMTZ","label":"PÉRIMÈTRE ANNEXE DE METZ","parent":"B53400"},{"uid":"C53420","code":"53420","parentCode":"53400","level":"C","familyCode":"C5000","sigle":"PLEPL","label":"PÉRIMÈTRE LOCAL D’ÉPINAL","parent":"B53400"},{"uid":"C53435","code":"53435","parentCode":"53400","level":"C","familyCode":"C5000","sigle":"PLMHE","label":"PÉRIMÈTRE LOCAL DE MULHOUSE","parent":"B53400"},{"uid":"A51500","code":"51500","parentCode":"50000","level":"A","familyCode":"A5000","sigle":"RMCGO","label":"REGROUPEMENT DES MOBILITÉS DU CENTRE ET DU GRAND-OUEST","parent":null},{"uid":"B51600","code":"51600","parentCode":"51500","level":"B","familyCode":"B5000","sigle":"SGBAP","label":"SECTEUR GESTIONNAIRE DU BASSIN AQUITAIN ET DES PYRÉNÉES","parent":"A51500"},{"uid":"C51600","code":"51600","parentCode":"51600","level":"C","familyCode":"C5000","sigle":"PGTLS","label":"PÉRIMÈTRE GESTIONNAIRE DE TOULOUSE","parent":"B51600"},{"uid":"C51620","code":"51620","parentCode":"51600","level":"C","familyCode":"C5000","sigle":"PLDAX","label":"PÉRIMÈTRE LOCAL DE DAX","parent":"B51600"},{"uid":"C51635","code":"51635","parentCode":"51600","level":"C","familyCode":"C5000","sigle":"PLFOX","label":"PÉRIMÈTRE LOCAL DE FOIX","parent":"B51600"},{"uid":"B52600","code":"52600","parentCode":"51600","level":"B","familyCode":"B5000","sigle":"SCTLP","label":"SECTEUR COORDINATEUR DES TERRES DU LIMOUSIN ET DU PÉRIGORD","parent":"B51600"},{"uid":"C52600","code":"52600","parentCode":"52600","level":"C","familyCode":"C5000","sigle":"PCLMG","label":"PÉRIMÈTRE COORDINATEUR DE LIMOGES","parent":"B52600"},{"uid":"C52620","code":"52620","parentCode":"52600","level":"C","familyCode":"C5000","sigle":"PLBLG","label":"PÉRIMÈTRE LOCAL DE BRIVE-LA-GAILLARDE","parent":"B52600"},{"uid":"C52635","code":"52635","parentCode":"52600","level":"C","familyCode":"C5000","sigle":"PLPGX","label":"PÉRIMÈTRE LOCAL DE PÉRIGUEUX","parent":"B52600"},{"uid":"B51700","code":"51700","parentCode":"51500","level":"B","familyCode":"B5000","sigle":"SGLAP","label":"SECTEUR GESTIONNAIRE DU LITTORAL ATLANTIQUE ET DU POITOU","parent":"A51500"},{"uid":"C51700","code":"51700","parentCode":"51700","level":"C","familyCode":"C5000","sigle":"PGBDX","label":"PÉRIMÈTRE GESTIONNAIRE DE BORDEAUX","parent":"B51700"},{"uid":"C51720","code":"51720","parentCode":"51700","level":"C","familyCode":"C5000","sigle":"PLPTS","label":"PÉRIMÈTRE LOCAL DE POITIERS","parent":"B51700"},{"uid":"C51735","code":"51735","parentCode":"51700","level":"C","familyCode":"C5000","sigle":"PLSTS","label":"PÉRIMÈTRE LOCAL DE SAINTES","parent":"B51700"},{"uid":"B52700","code":"52700","parentCode":"51700","level":"B","familyCode":"B5000","sigle":"SCVLB","label":"SECTEUR COORDINATEUR DE LA VALLÉE DE LA LOIRE ET DE LA BEAUCE","parent":"B51700"},{"uid":"C52700","code":"52700","parentCode":"52700","level":"C","familyCode":"C5000","sigle":"PCTRS","label":"PÉRIMÈTRE COORDINATEUR DE TOURS","parent":"B52700"},{"uid":"C52720","code":"52720","parentCode":"52700","level":"C","familyCode":"C5000","sigle":"PLOLS","label":"PÉRIMÈTRE LOCAL D’ORLÉANS","parent":"B52700"},{"uid":"C52735","code":"52735","parentCode":"52700","level":"C","familyCode":"C5000","sigle":"PLCHS","label":"PÉRIMÈTRE LOCAL DE CHARTRES","parent":"B52700"},{"uid":"B51800","code":"51800","parentCode":"51500","level":"B","familyCode":"B5000","sigle":"SGMAM","label":"SECTEUR GESTIONNAIRE DU MASSIF ARMORICAIN ET DU MAINE","parent":"A51500"},{"uid":"C51800","code":"51800","parentCode":"51800","level":"C","familyCode":"C5000","sigle":"PGRNS","label":"PÉRIMÈTRE GESTIONNAIRE DE RENNES","parent":"B51800"},{"uid":"C51820","code":"51820","parentCode":"51800","level":"C","familyCode":"C5000","sigle":"PLBST","label":"PÉRIMÈTRE LOCAL DE BREST","parent":"B51800"},{"uid":"C51835","code":"51835","parentCode":"51800","level":"C","familyCode":"C5000","sigle":"PLLMS","label":"PÉRIMÈTRE LOCAL DU MANS","parent":"B51800"},{"uid":"B52800","code":"52800","parentCode":"51800","level":"B","familyCode":"B5000","sigle":"SCLOB","label":"SECTEUR COORDINATEUR DE LA LOIRE OCÉANE ET DE LA BRETAGNE","parent":"B51800"},{"uid":"C52800","code":"52800","parentCode":"52800","level":"C","familyCode":"C5000","sigle":"PCNTS","label":"PÉRIMÈTRE COORDINATEUR DE NANTES","parent":"B52800"},{"uid":"C52820","code":"52820","parentCode":"52800","level":"C","familyCode":"C5000","sigle":"PLQPR","label":"PÉRIMÈTRE LOCAL DE QUIMPER","parent":"B52800"},{"uid":"C52835","code":"52835","parentCode":"52800","level":"C","familyCode":"C5000","sigle":"PLAGS","label":"PÉRIMÈTRE LOCAL D’ANGERS","parent":"B52800"},{"uid":"B51900","code":"51900","parentCode":"51500","level":"B","familyCode":"B5000","sigle":"SGCNS","label":"SECTEUR GESTIONNAIRE DES CÔTES NORMANDES ET DE LA SEINE","parent":"A51500"},{"uid":"C51900","code":"51900","parentCode":"51900","level":"C","familyCode":"C5000","sigle":"PGCEN","label":"PÉRIMÈTRE GESTIONNAIRE DE CAEN","parent":"B51900"},{"uid":"C51920","code":"51920","parentCode":"51900","level":"C","familyCode":"C5000","sigle":"PLREN","label":"PÉRIMÈTRE LOCAL DE ROUEN","parent":"B51900"},{"uid":"C51935","code":"51935","parentCode":"51900","level":"C","familyCode":"C5000","sigle":"PLLHV","label":"PÉRIMÈTRE LOCAL DU HAVRE","parent":"B51900"},{"uid":"B52900","code":"52900","parentCode":"51900","level":"B","familyCode":"B5000","sigle":"SCPCO","label":"SECTEUR COORDINATEUR DE LA PICARDIE ET DE LA CÔTE-D'OPALE","parent":"B51900"},{"uid":"C52900","code":"52900","parentCode":"52900","level":"C","familyCode":"C5000","sigle":"PCAMS","label":"PÉRIMÈTRE COORDINATEUR D’AMIENS","parent":"B52900"},{"uid":"C52920","code":"52920","parentCode":"52900","level":"C","familyCode":"C5000","sigle":"PLARR","label":"PÉRIMÈTRE LOCAL D’ARRAS","parent":"B52900"},{"uid":"C52935","code":"52935","parentCode":"52900","level":"C","familyCode":"C5000","sigle":"PLLAN","label":"PÉRIMÈTRE LOCAL DE LAON","parent":"B52900"},{"uid":"B54900","code":"54900","parentCode":"52900","level":"B","familyCode":"B5000","sigle":"SAFLH","label":"SECTEUR ANNEXE DES FLANDRES ET DU HAINAUT","parent":"B52900"},{"uid":"C54900","code":"54900","parentCode":"54900","level":"C","familyCode":"C5000","sigle":"PADKQ","label":"PÉRIMÈTRE ANNEXE DE DUNKERQUE","parent":"B54900"},{"uid":"C54920","code":"54920","parentCode":"54900","level":"C","familyCode":"C5000","sigle":"PLDUA","label":"PÉRIMÈTRE LOCAL DE DOUAI","parent":"B54900"},{"uid":"C54935","code":"54935","parentCode":"54900","level":"C","familyCode":"C5000","sigle":"PLVCN","label":"PÉRIMÈTRE LOCAL DE VALENCIENNES","parent":"B54900"}];
+    const byId = new Map(DATA.map(function(n) { return [n.uid, n]; }));
+    const children = new Map(DATA.map(function(n) { return [n.uid, []]; }));
+    DATA.forEach(function(n) { if (n.parent && children.has(n.parent)) children.get(n.parent).push(n); });
+    const roots = DATA.filter(function(n) { return n.level === "A"; });
+    const opened = new Set();
+    const columns = document.getElementById("columns");
+    const search = document.getElementById("search");
+    const status = document.getElementById("search-status");
+    const clearSearch = document.getElementById("clear-search");
+
+    function textElement(tag, className, content) {
+      const el = document.createElement(tag);
+      if (className) el.className = className;
+      if (content !== undefined) el.textContent = content;
+      return el;
+    }
+    function normalize(value) {
+      return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[’']/g, " ").replace(/\s+/g, " ").trim();
+    }
+    function matches(n, q) {
+      return normalize([n.code, n.parentCode, n.familyCode, n.sigle, n.label].join(" ")).includes(q);
+    }
+    function countDescendants(root, level) {
+      let count = 0;
+      const queue = (children.get(root.uid) || []).slice();
+      while (queue.length) {
+        const n = queue.shift();
+        if (n.level === level) count++;
+        queue.push.apply(queue, children.get(n.uid) || []);
+      }
+      return count;
+    }
+    function displayNode(n, q, ancestorMatched) {
+      const ownMatch = q !== "" && matches(n, q);
+      const isVisible = !q || ownMatch || ancestorMatched || (children.get(n.uid) || []).some(function(child) { return subtreeMatches(child, q); });
+      if (!isVisible) return null;
+
+      const li = textElement("li", "tree-item" + (ownMatch ? " is-match" : ""));
+      const meta = textElement("div", "node-meta");
+      meta.append(textElement("span", "", "CODE " + n.code), textElement("span", "", n.sigle));
+      li.append(meta);
+
+      const allChildren = children.get(n.uid) || [];
+      const activeChildren = q ? allChildren.filter(function(c) {
+        return ownMatch || ancestorMatched || subtreeMatches(c, q);
+      }) : allChildren;
+      const hasChildren = allChildren.length > 0;
+      const isOpen = Boolean(q) || opened.has(n.uid);
+      const label = n.label;
+      const card = textElement(hasChildren ? "button" : "div",
+        "node-card " + (n.level === "B" ? "is-sector" : "is-perimeter"));
+      card.append(textElement("span", "node-title", label));
+
+      if (hasChildren) {
+        card.type = "button";
+        card.dataset.toggle = n.uid;
+        card.setAttribute("aria-expanded", String(isOpen));
+        card.setAttribute("aria-label", (isOpen ? "Replier : " : "Déplier : ") + label);
+        card.append(textElement("span", "expand-symbol", isOpen ? "−" : "+"));
+      } else {
+        card.append(textElement("span", "leaf-marker"));
+      }
+      li.append(card);
+
+      if (hasChildren && isOpen) {
+        const subtree = textElement("ul", "tree-children");
+        const showAllBelow = ancestorMatched || ownMatch;
+        activeChildren.forEach(function(child) {
+          const childEl = displayNode(child, q, showAllBelow);
+          if (childEl) subtree.append(childEl);
+        });
+        if (subtree.childElementCount) li.append(subtree);
+      }
+      return li;
+    }
+    function subtreeMatches(n, q) {
+      if (matches(n, q)) return true;
+      return (children.get(n.uid) || []).some(function(child) { return subtreeMatches(child, q); });
+    }
+    function render() {
+      const q = normalize(search.value);
+      const hits = q ? DATA.filter(function(n) { return matches(n, q); }) : [];
+      status.textContent = q ? hits.length + (hits.length > 1 ? " résultats" : " résultat") + " sur 74 notions" : "74 notions dans le référentiel";
+      clearSearch.hidden = q === "";
+      const fragment = document.createDocumentFragment();
+
+      roots.forEach(function(root) {
+        const group = textElement("section", "group");
+        group.setAttribute("aria-label", root.label);
+        const head = textElement("header", "group-header");
+        head.append(textElement("div", "group-code", "CODE " + root.code + " · " + root.sigle));
+        head.append(textElement("h2", "group-title", root.label));
+        const sectors = countDescendants(root, "B");
+        const perimeters = countDescendants(root, "C");
+        head.append(textElement("p", "group-summary", sectors + " secteurs · " + perimeters + " périmètres"));
+        group.append(head);
+
+        const tree = textElement("div", "group-tree");
+        const list = textElement("ul", "tree-list");
+        const rootMatches = q !== "" && matches(root, q);
+        (children.get(root.uid) || []).forEach(function(n) {
+          const item = displayNode(n, q, rootMatches);
+          if (item) list.append(item);
+        });
+        if (list.childElementCount) tree.append(list);
+        else tree.append(textElement("p", "empty", q ? "Aucun résultat dans ce regroupement." : "Aucun secteur enregistré."));
+        group.append(tree);
+        fragment.append(group);
+      });
+      columns.replaceChildren(fragment);
+    }
+    columns.addEventListener("click", function(event) {
+      const btn = event.target.closest("button[data-toggle]");
+      if (!btn) return;
+      const uid = btn.dataset.toggle;
+      if (opened.has(uid)) opened.delete(uid);
+      else opened.add(uid);
+      render();
+      const focusBtn = Array.from(columns.querySelectorAll("button[data-toggle]")).find(function(b) { return b.dataset.toggle === uid; });
+      if (focusBtn) focusBtn.focus({preventScroll:true});
+    });
+    document.getElementById("expand-all").addEventListener("click", function() {
+      DATA.forEach(function(n) { if (n.level === "B") opened.add(n.uid); });
+      render();
+    });
+    document.getElementById("collapse-all").addEventListener("click", function() {
+      opened.clear();
+      render();
+    });
+    search.addEventListener("input", render);
+    search.addEventListener("keydown", function(event) {
+      if (event.key === "Escape") {
+        search.value = "";
+        render();
+      }
+    });
+    clearSearch.addEventListener("click", function() {
+      search.value = "";
+      render();
+      search.focus();
+    });
+    render();
+  </script>
 </body>
 </html>
