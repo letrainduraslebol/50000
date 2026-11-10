@@ -205,13 +205,13 @@
           <p class="search-status" id="search-status" role="status" aria-live="polite">74 notions dans le référentiel</p>
         </div>
         <div class="actions">
-          <button class="action" id="expand-all" type="button">Tout déplier</button>
-          <button class="action" id="collapse-all" type="button">Tout replier</button>
+          <button class="action" id="expand-all" type="button">Afficher tous les périmètres</button>
+          <button class="action" id="collapse-all" type="button">Masquer les périmètres</button>
         </div>
       </div>
       <div class="branch-legend" aria-label="Lecture des branches"><span><i class="branch-line"></i> Gestionnaire</span><span><i class="branch-line coordinateur"></i> Coordinateur</span><span><i class="branch-line annexe"></i> Annexe</span></div>
       <div id="columns" class="columns" aria-label="Organigrammes des regroupements"></div>
-      <p class="help">Les secteurs gestionnaires, coordinateurs et annexes sont visibles dès l'ouverture. Un clic sur un secteur permet de replier sa branche ou d'ouvrir ses périmètres. Les recherches parcourent les deux regroupements et tous leurs rattachements.</p>
+      <p class="help">Les 18 secteurs gestionnaires, coordinateurs et annexes sont toujours visibles dans leur hiérarchie. Seuls les 54 périmètres sont repliables. Les recherches parcourent les deux regroupements et tous leurs rattachements.</p>
     </main>
     <footer class="footer">Source : « 50000-0Y100 – Les périmètres ». Codes et rattachements conservés.</footer>
   </div>
@@ -223,10 +223,8 @@
     const children = new Map(DATA.map(function(n) { return [n.uid, []]; }));
     DATA.forEach(function(n) { if (n.parent && children.has(n.parent)) children.get(n.parent).push(n); });
     const roots = DATA.filter(function(n) { return n.level === "A"; });
-    // Afficher immédiatement la hiérarchie des secteurs B, sans déployer les 54 périmètres C.
-    const opened = new Set(DATA.filter(function(n) {
-      return n.level === "B" && (children.get(n.uid) || []).some(function(child) { return child.level === "B"; });
-    }).map(function(n) { return n.uid; }));
+    // Les 18 secteurs (8 gestionnaires, 7 coordinateurs, 3 annexes) restent toujours affichés.
+    // Seuls les périmètres se déplient ; aucun clic ne masque un secteur.
     const shownPerimeters = new Set();
     const columns = document.getElementById("columns");
     const search = document.getElementById("search");
@@ -282,16 +280,11 @@
 
       const sectorChildren = allChildren.filter(function(child) { return child.level === "B"; });
       const perimeterChildren = allChildren.filter(function(child) { return child.level === "C"; });
-      const hasSectors = sectorChildren.length > 0;
       const hasPerimeters = perimeterChildren.length > 0;
-      const sectorOpen = !!q || opened.has(n.uid);
       const perimeterOpen = !!q || shownPerimeters.has(n.uid);
-      // Le rectangle principal replie les sous-secteurs, ou les périmètres d'un secteur terminal.
-      const expandable = hasSectors || hasPerimeters;
-      const expanded = hasSectors ? sectorOpen : perimeterOpen;
-      const card = textElement(expandable ? "button" : "div",
-        "node-card " + (n.level === "B" ? "is-sector kind-" + kind : "is-perimeter"));
-      // Dans chaque capsule : RACINE / CODE / ORDRE / APPEL, puis l'intitulé entier sans coupure.
+
+      // Un secteur ne se replie jamais : ses enfants de niveau B restent visibles.
+      const card = textElement("div", "node-card " + (n.level === "B" ? "is-sector kind-" + kind : "is-perimeter"));
       const content = textElement("span", "node-content");
       appendMetadata(content, n);
       const textWrap = textElement("span", "node-title-wrap");
@@ -300,18 +293,11 @@
       textWrap.append(title);
       content.append(textWrap);
       card.append(content);
-      if (expandable) {
-        card.type = "button";
-        card.dataset.toggle = n.uid;
-        card.setAttribute("aria-expanded", String(expanded));
-        card.setAttribute("aria-label", (expanded ? "Replier : " : "Déplier : ") + n.label);
-        card.append(textElement("span", "expand-symbol", expanded ? "−" : "+"));
-      } else {
-        card.append(textElement("span", "leaf-marker"));
-      }
       li.append(card);
+
       const showAll = ancestorMatched || ownMatch;
-      if (hasSectors && sectorOpen) {
+      // Affichage INCONDITIONNEL des sous-secteurs quand aucune recherche n'est active.
+      if (sectorChildren.length) {
         const sectorList = textElement("ul", "tree-children sector-tree");
         sectorChildren.forEach(function(child) {
           if (!q || showAll || subtreeMatches(child, q)) {
@@ -321,12 +307,12 @@
         });
         if (sectorList.childElementCount) li.append(sectorList);
       }
+
       if (hasPerimeters) {
-        // Leurs branches restent fermées à l'arrivée pour une lecture claire des 18 secteurs.
-        // Si des sous-secteurs existent, afficher une commande dédiée aux périmètres.
-        if (hasSectors && !q) {
+        if (!q) {
           const control = textElement("div", "perimeter-row");
-          const btn = textElement("button", "perimeter-toggle", (perimeterOpen ? "− Masquer" : "+ Afficher") + " les périmètres (" + perimeterChildren.length + ")");
+          const btn = textElement("button", "perimeter-toggle",
+            (perimeterOpen ? "− Masquer" : "+ Afficher") + " les périmètres (" + perimeterChildren.length + ")");
           btn.type = "button";
           btn.dataset.perimeters = n.uid;
           btn.setAttribute("aria-expanded", String(perimeterOpen));
@@ -353,7 +339,7 @@
     function render() {
       const q = normalize(search.value);
       const hits = q ? DATA.filter(function(n) { return matches(n, q); }) : [];
-      status.textContent = q ? hits.length + (hits.length > 1 ? " résultats" : " résultat") + " sur 74 notions" : "74 notions dans le référentiel";
+      status.textContent = q ? hits.length + (hits.length > 1 ? " résultats" : " résultat") + " sur 74 notions" : "18 secteurs affichés sur 18 · 54 périmètres à déplier";
       clearSearch.hidden = q === "";
       const fragment = document.createDocumentFragment();
 
@@ -383,37 +369,23 @@
       columns.replaceChildren(fragment);
     }
     columns.addEventListener("click", function(event) {
-      const perimeterBtn = event.target.closest("button[data-perimeters]");
-      const btn = event.target.closest("button[data-toggle]");
-      if (!btn && !perimeterBtn) return;
-      const uid = perimeterBtn ? perimeterBtn.dataset.perimeters : btn.dataset.toggle;
-      if (perimeterBtn) {
-        if (shownPerimeters.has(uid)) shownPerimeters.delete(uid);
-        else shownPerimeters.add(uid);
-      } else {
-        const hasSectorChildren = (children.get(uid) || []).some(function(child) { return child.level === "B"; });
-        const target = hasSectorChildren ? opened : shownPerimeters;
-        if (target.has(uid)) target.delete(uid);
-        else target.add(uid);
-      }
+      const btn = event.target.closest("button[data-perimeters]");
+      if (!btn) return;
+      const uid = btn.dataset.perimeters;
+      if (shownPerimeters.has(uid)) shownPerimeters.delete(uid);
+      else shownPerimeters.add(uid);
       render();
-      const selector = perimeterBtn ? "button[data-perimeters]" : "button[data-toggle]";
-      const focusBtn = Array.from(columns.querySelectorAll(selector)).find(function(b) {
-        return (perimeterBtn ? b.dataset.perimeters : b.dataset.toggle) === uid;
-      });
+      const focusBtn = Array.from(columns.querySelectorAll("button[data-perimeters]"))
+        .find(function(b) { return b.dataset.perimeters === uid; });
       if (focusBtn) focusBtn.focus({preventScroll:true});
     });
     document.getElementById("expand-all").addEventListener("click", function() {
       DATA.forEach(function(n) {
-        if (n.level === "B") {
-          opened.add(n.uid);
-          shownPerimeters.add(n.uid);
-        }
+        if ((children.get(n.uid) || []).some(function(child) { return child.level === "C"; })) shownPerimeters.add(n.uid);
       });
       render();
     });
     document.getElementById("collapse-all").addEventListener("click", function() {
-      opened.clear();
       shownPerimeters.clear();
       render();
     });
