@@ -104,11 +104,22 @@
     .tree-item.kind-gestionnaire > .tree-children { border-left: 2px solid var(--yellow); }
     .tree-item.kind-coordinateur > .tree-children { border-left: 2px dashed var(--yellow); }
     .tree-item.kind-annexe > .tree-children { border-left: 2px dotted var(--yellow); }
+    /* Repères d'abord, puis intitulé complet sur une seule ligne jaune. */
     .node-content { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 9px; }
     .node-content .node-meta { margin: 0; gap: 4px; }
     .node-content .meta-chip { min-height: 23px; padding: 3px 7px; gap: 5px; }
-    .node-title-wrap { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-    .node-type { font-size: 10px; font-weight: 700; color: var(--yellow); line-height: 1.3; letter-spacing: .02em; }
+    .node-title-wrap {
+      display: block; min-width: 0; width: 100%;
+      overflow-x: auto; overflow-y: hidden;
+      scrollbar-width: thin; scrollbar-color: var(--yellow) transparent;
+      -webkit-overflow-scrolling: touch;
+    }
+    .node-title {
+      display: block; width: max-content; max-width: none;
+      white-space: nowrap; color: var(--yellow);
+      font-size: 12px; font-weight: 700; line-height: 1.6;
+      overflow-wrap: normal;
+    }
     .perimeter-row { padding: 10px 0 6px 18px; }
     .perimeter-toggle {
       display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px;
@@ -280,16 +291,14 @@
       const expanded = hasSectors ? sectorOpen : perimeterOpen;
       const card = textElement(expandable ? "button" : "div",
         "node-card " + (n.level === "B" ? "is-sector kind-" + kind : "is-perimeter"));
-      // Une seule capsule par notion : intitulé complet du type + nom + quatre repères intégrés.
+      // Dans chaque capsule : RACINE / CODE / ORDRE / APPEL, puis l'intitulé entier sans coupure.
       const content = textElement("span", "node-content");
-      const textWrap = textElement("span", "node-title-wrap");
-      const prefixMatch = n.label.match(/^(SECTEUR (?:GESTIONNAIRE|COORDINATEUR|ANNEXE)|PÉRIMÈTRE (?:GESTIONNAIRE|COORDINATEUR|ANNEXE|LOCAL))\b/);
-      const category = prefixMatch ? prefixMatch[1] : "";
-      const remainingTitle = category ? n.label.slice(category.length).trim() : n.label;
-      if (category) textWrap.append(textElement("span", "node-type", category));
-      textWrap.append(textElement("span", "node-title", remainingTitle));
-      content.append(textWrap);
       appendMetadata(content, n);
+      const textWrap = textElement("span", "node-title-wrap");
+      const title = textElement("span", "node-title", n.label);
+      title.title = n.label;
+      textWrap.append(title);
+      content.append(textWrap);
       card.append(content);
       if (expandable) {
         card.type = "button";
