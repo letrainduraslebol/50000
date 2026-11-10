@@ -104,8 +104,11 @@
     .tree-item.kind-gestionnaire > .tree-children { border-left: 2px solid var(--yellow); }
     .tree-item.kind-coordinateur > .tree-children { border-left: 2px dashed var(--yellow); }
     .tree-item.kind-annexe > .tree-children { border-left: 2px dotted var(--yellow); }
+    .node-content { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; gap: 9px; }
+    .node-content .node-meta { margin: 0; gap: 4px; }
+    .node-content .meta-chip { min-height: 23px; padding: 3px 7px; gap: 5px; }
     .node-title-wrap { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-    .node-type { font-size: 10px; font-weight: 700; color: var(--yellow); line-height: 1.3; }
+    .node-type { font-size: 10px; font-weight: 700; color: var(--yellow); line-height: 1.3; letter-spacing: .02em; }
     .perimeter-row { padding: 10px 0 6px 18px; }
     .perimeter-toggle {
       display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px;
@@ -118,7 +121,7 @@
     .perimeter-tree > .tree-item::before { top: 42px; }
     .group-tree .tree-list > .tree-item + .tree-item { margin-top: 22px; }
     .node-card {
-      width: 100%; display: flex; align-items: center; text-align: left;
+      width: 100%; display: flex; align-items: flex-start; text-align: left;
       justify-content: space-between; gap: 12px; padding: 11px 13px;
       background: var(--blue); border: 1px solid var(--yellow);
       color: var(--white); border-radius: 4px; min-width: 0;
@@ -129,7 +132,7 @@
     .node-title { overflow-wrap: anywhere; min-width: 0; }
     .expand-symbol {
       color: var(--yellow); font-size: 18px; font-weight: 500;
-      flex: 0 0 20px; text-align: center; line-height: 1;
+      flex: 0 0 20px; text-align: center; line-height: 1.2;
     }
     .leaf-marker { display: block; width: 6px; height: 6px; border: 1px solid var(--yellow); flex: 0 0 6px; }
     .is-match .node-card { border: 2px solid var(--yellow); }
@@ -265,7 +268,6 @@
 
       const kind = sectorKind(n);
       const li = textElement("li", "tree-item" + (kind ? " kind-" + kind : "") + (ownMatch ? " is-match" : ""));
-      appendMetadata(li, n);
 
       const sectorChildren = allChildren.filter(function(child) { return child.level === "B"; });
       const perimeterChildren = allChildren.filter(function(child) { return child.level === "C"; });
@@ -278,10 +280,17 @@
       const expanded = hasSectors ? sectorOpen : perimeterOpen;
       const card = textElement(expandable ? "button" : "div",
         "node-card " + (n.level === "B" ? "is-sector kind-" + kind : "is-perimeter"));
+      // Une seule capsule par notion : intitulé complet du type + nom + quatre repères intégrés.
+      const content = textElement("span", "node-content");
       const textWrap = textElement("span", "node-title-wrap");
-      if (kind) textWrap.append(textElement("span", "node-type", kind.toUpperCase()));
-      textWrap.append(textElement("span", "node-title", n.label));
-      card.append(textWrap);
+      const prefixMatch = n.label.match(/^(SECTEUR (?:GESTIONNAIRE|COORDINATEUR|ANNEXE)|PÉRIMÈTRE (?:GESTIONNAIRE|COORDINATEUR|ANNEXE|LOCAL))\b/);
+      const category = prefixMatch ? prefixMatch[1] : "";
+      const remainingTitle = category ? n.label.slice(category.length).trim() : n.label;
+      if (category) textWrap.append(textElement("span", "node-type", category));
+      textWrap.append(textElement("span", "node-title", remainingTitle));
+      content.append(textWrap);
+      appendMetadata(content, n);
+      card.append(content);
       if (expandable) {
         card.type = "button";
         card.dataset.toggle = n.uid;
