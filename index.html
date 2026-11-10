@@ -57,6 +57,11 @@
     .action:disabled { opacity: .55; cursor: default; }
     .actions { display: flex; flex-wrap: wrap; gap: 8px; }
     .search-status { margin: 7px 0 0; font-size: 12px; color: var(--white); min-height: 20px; }
+    .branch-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 10px; margin: 0 0 16px; }
+    .branch-legend > span { display: inline-flex; align-items: center; gap: 7px; }
+    .branch-line { display: inline-block; height: 0; width: 25px; border-top: 3px solid var(--yellow); }
+    .branch-line.coordinateur { border-top-style: dashed; }
+    .branch-line.annexe { border-top-style: dotted; }
 
     .columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: start; }
     .group { min-width: 0; border: 1px solid var(--yellow); }
@@ -79,7 +84,42 @@
       content: ""; position: absolute; width: 12px; height: 1px;
       background: var(--yellow); left: -18px; top: 42px;
     }
-    .node-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 0 0 5px 1px; font-size: 10px; font-weight: 600; color: var(--yellow); }
+    .tree-children > .tree-item.kind-coordinateur::before { border-top: 1px dashed var(--yellow); background: transparent; }
+    .tree-children > .tree-item.kind-annexe::before { border-top: 1px dotted var(--yellow); background: transparent; }
+    /* Quatre repères documentaires conservés sur chaque niveau : RACINE / CODE / ORDRE / APPEL. */
+    .node-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 9px; align-items: stretch; }
+    .meta-chip {
+      display: flex; flex-direction: column; gap: 1px; align-items: flex-start;
+      padding: 5px 8px 6px; border: 1px solid var(--yellow);
+      background: var(--blue); color: var(--white); border-radius: 3px;
+      min-width: 0;
+    }
+    .meta-name { font-size: 10px; font-weight: 500; line-height: 1.3; color: var(--yellow); }
+    .meta-value { font-size: 12px; font-weight: 700; line-height: 1.3; color: var(--white); overflow-wrap: anywhere; }
+    .meta-chip.meta-code { background: var(--yellow); color: var(--blue); }
+    .meta-code .meta-name, .meta-code .meta-value { color: var(--blue); }
+    .group-header .node-meta { margin-bottom: 13px; }
+    .group-header .meta-chip { border-color: var(--yellow); }
+    /* Les niveaux B s'identifient par leur trait : plein, tireté, ou pointillé. */
+    .node-card.is-sector.kind-gestionnaire { border-left: 4px solid var(--yellow); }
+    .node-card.is-sector.kind-coordinateur { border-left: 4px dashed var(--yellow); }
+    .node-card.is-sector.kind-annexe { border-left: 4px dotted var(--yellow); }
+    .tree-item.kind-gestionnaire > .tree-children { border-left: 2px solid var(--yellow); }
+    .tree-item.kind-coordinateur > .tree-children { border-left: 2px dashed var(--yellow); }
+    .tree-item.kind-annexe > .tree-children { border-left: 2px dotted var(--yellow); }
+    .node-title-wrap { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .node-type { font-size: 10px; font-weight: 700; color: var(--yellow); line-height: 1.3; }
+    .perimeter-row { padding: 10px 0 6px 18px; }
+    .perimeter-toggle {
+      display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px;
+      font-size: 12px; font-weight: 600; color: var(--yellow);
+      border: 1px solid var(--line); border-radius: 4px; background: var(--blue);
+      padding: 6px 10px; text-align: left;
+    }
+    .perimeter-toggle:hover { background: rgba(255,206,62,.08); }
+    .perimeter-tree { margin-top: 12px; margin-bottom: 5px; }
+    .perimeter-tree > .tree-item::before { top: 42px; }
+    .group-tree .tree-list > .tree-item + .tree-item { margin-top: 22px; }
     .node-card {
       width: 100%; display: flex; align-items: center; text-align: left;
       justify-content: space-between; gap: 12px; padding: 11px 13px;
@@ -165,8 +205,9 @@
           <button class="action" id="collapse-all" type="button">Tout replier</button>
         </div>
       </div>
+      <div class="branch-legend" aria-label="Lecture des branches"><span><i class="branch-line"></i> Gestionnaire</span><span><i class="branch-line coordinateur"></i> Coordinateur</span><span><i class="branch-line annexe"></i> Annexe</span></div>
       <div id="columns" class="columns" aria-label="Organigrammes des regroupements"></div>
-      <p class="help">Pour consulter un secteur, cliquez sur son rectangle : les éléments rattachés s'affichent directement en dessous. Utilisez la recherche pour retrouver une notion dans les deux regroupements.</p>
+      <p class="help">Les secteurs gestionnaires, coordinateurs et annexes sont visibles dès l'ouverture. Un clic sur un secteur permet de replier sa branche ou d'ouvrir ses périmètres. Les recherches parcourent les deux regroupements et tous leurs rattachements.</p>
     </main>
     <footer class="footer">Source : « 50000-0Y100 – Les périmètres ». Codes et rattachements conservés.</footer>
   </div>
@@ -178,7 +219,11 @@
     const children = new Map(DATA.map(function(n) { return [n.uid, []]; }));
     DATA.forEach(function(n) { if (n.parent && children.has(n.parent)) children.get(n.parent).push(n); });
     const roots = DATA.filter(function(n) { return n.level === "A"; });
-    const opened = new Set();
+    // Afficher immédiatement la hiérarchie des secteurs B, sans déployer les 54 périmètres C.
+    const opened = new Set(DATA.filter(function(n) {
+      return n.level === "B" && (children.get(n.uid) || []).some(function(child) { return child.level === "B"; });
+    }).map(function(n) { return n.uid; }));
+    const shownPerimeters = new Set();
     const columns = document.getElementById("columns");
     const search = document.getElementById("search");
     const status = document.getElementById("search-status");
@@ -206,46 +251,90 @@
       }
       return count;
     }
+    function sectorKind(n) {
+      if (n.level !== "B") return "";
+      if (n.label.indexOf("SECTEUR GESTIONNAIRE") === 0) return "gestionnaire";
+      if (n.label.indexOf("SECTEUR COORDINATEUR") === 0) return "coordinateur";
+      return "annexe";
+    }
+    function appendMetadata(parent, n) {
+      const meta = textElement("div", "node-meta");
+      [["RACINE", n.parentCode], ["CODE", n.code], ["ORDRE", n.familyCode], ["APPEL", n.sigle]].forEach(function(pair) {
+        const chip = textElement("span", "meta-chip" + (pair[0] === "CODE" ? " meta-code" : ""));
+        chip.append(textElement("span", "meta-name", pair[0]));
+        chip.append(textElement("span", "meta-value", pair[1]));
+        meta.append(chip);
+      });
+      parent.append(meta);
+    }
     function displayNode(n, q, ancestorMatched) {
       const ownMatch = q !== "" && matches(n, q);
-      const isVisible = !q || ownMatch || ancestorMatched || (children.get(n.uid) || []).some(function(child) { return subtreeMatches(child, q); });
-      if (!isVisible) return null;
-
-      const li = textElement("li", "tree-item" + (ownMatch ? " is-match" : ""));
-      const meta = textElement("div", "node-meta");
-      meta.append(textElement("span", "", "CODE " + n.code), textElement("span", "", n.sigle));
-      li.append(meta);
-
       const allChildren = children.get(n.uid) || [];
-      const activeChildren = q ? allChildren.filter(function(c) {
-        return ownMatch || ancestorMatched || subtreeMatches(c, q);
-      }) : allChildren;
-      const hasChildren = allChildren.length > 0;
-      const isOpen = Boolean(q) || opened.has(n.uid);
-      const label = n.label;
-      const card = textElement(hasChildren ? "button" : "div",
-        "node-card " + (n.level === "B" ? "is-sector" : "is-perimeter"));
-      card.append(textElement("span", "node-title", label));
+      const includesHit = q && (ownMatch || ancestorMatched || allChildren.some(function(child) { return subtreeMatches(child, q); }));
+      if (q && !includesHit) return null;
 
-      if (hasChildren) {
+      const kind = sectorKind(n);
+      const li = textElement("li", "tree-item" + (kind ? " kind-" + kind : "") + (ownMatch ? " is-match" : ""));
+      appendMetadata(li, n);
+
+      const sectorChildren = allChildren.filter(function(child) { return child.level === "B"; });
+      const perimeterChildren = allChildren.filter(function(child) { return child.level === "C"; });
+      const hasSectors = sectorChildren.length > 0;
+      const hasPerimeters = perimeterChildren.length > 0;
+      const sectorOpen = !!q || opened.has(n.uid);
+      const perimeterOpen = !!q || shownPerimeters.has(n.uid);
+      // Le rectangle principal replie les sous-secteurs, ou les périmètres d'un secteur terminal.
+      const expandable = hasSectors || hasPerimeters;
+      const expanded = hasSectors ? sectorOpen : perimeterOpen;
+      const card = textElement(expandable ? "button" : "div",
+        "node-card " + (n.level === "B" ? "is-sector kind-" + kind : "is-perimeter"));
+      const textWrap = textElement("span", "node-title-wrap");
+      if (kind) textWrap.append(textElement("span", "node-type", kind.toUpperCase()));
+      textWrap.append(textElement("span", "node-title", n.label));
+      card.append(textWrap);
+      if (expandable) {
         card.type = "button";
         card.dataset.toggle = n.uid;
-        card.setAttribute("aria-expanded", String(isOpen));
-        card.setAttribute("aria-label", (isOpen ? "Replier : " : "Déplier : ") + label);
-        card.append(textElement("span", "expand-symbol", isOpen ? "−" : "+"));
+        card.setAttribute("aria-expanded", String(expanded));
+        card.setAttribute("aria-label", (expanded ? "Replier : " : "Déplier : ") + n.label);
+        card.append(textElement("span", "expand-symbol", expanded ? "−" : "+"));
       } else {
         card.append(textElement("span", "leaf-marker"));
       }
       li.append(card);
-
-      if (hasChildren && isOpen) {
-        const subtree = textElement("ul", "tree-children");
-        const showAllBelow = ancestorMatched || ownMatch;
-        activeChildren.forEach(function(child) {
-          const childEl = displayNode(child, q, showAllBelow);
-          if (childEl) subtree.append(childEl);
+      const showAll = ancestorMatched || ownMatch;
+      if (hasSectors && sectorOpen) {
+        const sectorList = textElement("ul", "tree-children sector-tree");
+        sectorChildren.forEach(function(child) {
+          if (!q || showAll || subtreeMatches(child, q)) {
+            const el = displayNode(child, q, showAll);
+            if (el) sectorList.append(el);
+          }
         });
-        if (subtree.childElementCount) li.append(subtree);
+        if (sectorList.childElementCount) li.append(sectorList);
+      }
+      if (hasPerimeters) {
+        // Leurs branches restent fermées à l'arrivée pour une lecture claire des 18 secteurs.
+        // Si des sous-secteurs existent, afficher une commande dédiée aux périmètres.
+        if (hasSectors && !q) {
+          const control = textElement("div", "perimeter-row");
+          const btn = textElement("button", "perimeter-toggle", (perimeterOpen ? "− Masquer" : "+ Afficher") + " les périmètres (" + perimeterChildren.length + ")");
+          btn.type = "button";
+          btn.dataset.perimeters = n.uid;
+          btn.setAttribute("aria-expanded", String(perimeterOpen));
+          control.append(btn);
+          li.append(control);
+        }
+        if (perimeterOpen) {
+          const perimeterList = textElement("ul", "tree-children perimeter-tree");
+          perimeterChildren.forEach(function(child) {
+            if (!q || showAll || subtreeMatches(child, q)) {
+              const el = displayNode(child, q, showAll);
+              if (el) perimeterList.append(el);
+            }
+          });
+          if (perimeterList.childElementCount) li.append(perimeterList);
+        }
       }
       return li;
     }
@@ -264,7 +353,7 @@
         const group = textElement("section", "group");
         group.setAttribute("aria-label", root.label);
         const head = textElement("header", "group-header");
-        head.append(textElement("div", "group-code", "CODE " + root.code + " · " + root.sigle));
+        appendMetadata(head, root);
         head.append(textElement("h2", "group-title", root.label));
         const sectors = countDescendants(root, "B");
         const perimeters = countDescendants(root, "C");
@@ -286,21 +375,38 @@
       columns.replaceChildren(fragment);
     }
     columns.addEventListener("click", function(event) {
+      const perimeterBtn = event.target.closest("button[data-perimeters]");
       const btn = event.target.closest("button[data-toggle]");
-      if (!btn) return;
-      const uid = btn.dataset.toggle;
-      if (opened.has(uid)) opened.delete(uid);
-      else opened.add(uid);
+      if (!btn && !perimeterBtn) return;
+      const uid = perimeterBtn ? perimeterBtn.dataset.perimeters : btn.dataset.toggle;
+      if (perimeterBtn) {
+        if (shownPerimeters.has(uid)) shownPerimeters.delete(uid);
+        else shownPerimeters.add(uid);
+      } else {
+        const hasSectorChildren = (children.get(uid) || []).some(function(child) { return child.level === "B"; });
+        const target = hasSectorChildren ? opened : shownPerimeters;
+        if (target.has(uid)) target.delete(uid);
+        else target.add(uid);
+      }
       render();
-      const focusBtn = Array.from(columns.querySelectorAll("button[data-toggle]")).find(function(b) { return b.dataset.toggle === uid; });
+      const selector = perimeterBtn ? "button[data-perimeters]" : "button[data-toggle]";
+      const focusBtn = Array.from(columns.querySelectorAll(selector)).find(function(b) {
+        return (perimeterBtn ? b.dataset.perimeters : b.dataset.toggle) === uid;
+      });
       if (focusBtn) focusBtn.focus({preventScroll:true});
     });
     document.getElementById("expand-all").addEventListener("click", function() {
-      DATA.forEach(function(n) { if (n.level === "B") opened.add(n.uid); });
+      DATA.forEach(function(n) {
+        if (n.level === "B") {
+          opened.add(n.uid);
+          shownPerimeters.add(n.uid);
+        }
+      });
       render();
     });
     document.getElementById("collapse-all").addEventListener("click", function() {
       opened.clear();
+      shownPerimeters.clear();
       render();
     });
     search.addEventListener("input", render);
